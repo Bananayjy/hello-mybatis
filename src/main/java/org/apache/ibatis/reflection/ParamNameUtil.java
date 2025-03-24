@@ -24,15 +24,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ParamNameUtil {
+  /**
+   * 获得普通方法的参数列表
+   *
+   * @param method 普通方法
+   * @return 参数集合
+   */
   public static List<String> getParamNames(Method method) {
     return getParameterNames(method);
   }
 
+  /**
+   * 获得构造方法的参数列表
+   *
+   * @param constructor 构造方法
+   * @return 参数集合
+   */
   public static List<String> getParamNames(Constructor<?> constructor) {
     return getParameterNames(constructor);
   }
 
+
   private static List<String> getParameterNames(Executable executable) {
+    // 1.获得 Parameter 数组，并转换为Strem流
+    // 2.获得参数名
+    // 3.转换成List集合
     return Arrays.stream(executable.getParameters()).map(Parameter::getName).collect(Collectors.toList());
   }
 

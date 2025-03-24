@@ -36,16 +36,19 @@ public abstract class BaseWrapper implements ObjectWrapper {
   }
 
   protected Object resolveCollection(PropertyTokenizer prop, Object object) {
+    // 如果当前要找的属性名称=="", 直接返回object对象
     if ("".equals(prop.getName())) {
       return object;
     }
+    // 调用metaObject的getValue方法，获取对应属性名称的值
+    // 本质上调用 ObjectWrapper 的 get 方法，获取属性值
     return metaObject.getValue(prop.getName());
   }
 
   protected Object getCollectionValue(PropertyTokenizer prop, Object collection) {
     if (collection == null) {
       throw new ReflectionException("Cannot get the value '" + prop.getIndexedName() + "' because the property '"
-          + prop.getName() + "' is null.");
+        + prop.getName() + "' is null.");
     }
     if (collection instanceof Map) {
       return ((Map) collection).get(prop.getIndex());
@@ -73,14 +76,14 @@ public abstract class BaseWrapper implements ObjectWrapper {
       return ((short[]) collection)[i];
     } else {
       throw new ReflectionException("Cannot get the value '" + prop.getIndexedName() + "' because the property '"
-          + prop.getName() + "' is not Map, List or Array.");
+        + prop.getName() + "' is not Map, List or Array.");
     }
   }
 
   protected void setCollectionValue(PropertyTokenizer prop, Object collection, Object value) {
     if (collection == null) {
       throw new ReflectionException("Cannot set the value '" + prop.getIndexedName() + "' because the property '"
-          + prop.getName() + "' is null.");
+        + prop.getName() + "' is null.");
     }
     if (collection instanceof Map) {
       ((Map) collection).put(prop.getIndex(), value);
@@ -108,16 +111,20 @@ public abstract class BaseWrapper implements ObjectWrapper {
         ((short[]) collection)[i] = (Short) value;
       } else {
         throw new ReflectionException("Cannot set the value '" + prop.getIndexedName() + "' because the property '"
-            + prop.getName() + "' is not Map, List or Array.");
+          + prop.getName() + "' is not Map, List or Array.");
       }
     }
   }
 
   protected Object getChildValue(PropertyTokenizer prop) {
+    // 通过当前MetaObject对象的metaObjectForProperty方法，根据子表达式的值创建对象元数据，即MetaObject对象
     MetaObject metaValue = metaObject.metaObjectForProperty(prop.getIndexedName());
+    // 原始Object对象==null，则返回SystemMetaObject.NULL_META_OBJECT 对象
     if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
       return null;
     }
+    // 调用子表达式对应的MetaObject对象的getValue获取子表达式的值
+    // 实质：调用 ObjectWrapper 的 get 方法，获取属性值
     return metaValue.getValue(prop.getChildren());
   }
 

@@ -32,22 +32,26 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
  */
 public class MetaObject {
 
+  // 原始 Object 对象
   private final Object originalObject;
+  // 封装过的 Object 对象
   private final ObjectWrapper objectWrapper;
   private final ObjectFactory objectFactory;
   private final ObjectWrapperFactory objectWrapperFactory;
   private final ReflectorFactory reflectorFactory;
 
   private MetaObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory,
-      ReflectorFactory reflectorFactory) {
+                     ReflectorFactory reflectorFactory) {
     this.originalObject = object;
     this.objectFactory = objectFactory;
     this.objectWrapperFactory = objectWrapperFactory;
     this.reflectorFactory = reflectorFactory;
 
+    // 根据object的类型，创建不同的ObjectWrapper对象
     if (object instanceof ObjectWrapper) {
       this.objectWrapper = (ObjectWrapper) object;
     } else if (objectWrapperFactory.hasWrapperFor(object)) {
+      // DefaultObjectWrapperFactory 未实现任何逻辑，所以这块逻辑相当于暂时不起作用
       this.objectWrapper = objectWrapperFactory.getWrapperFor(this, object);
     } else if (object instanceof Map) {
       this.objectWrapper = new MapWrapper(this, (Map) object);
@@ -59,10 +63,11 @@ public class MetaObject {
   }
 
   public static MetaObject forObject(Object object, ObjectFactory objectFactory,
-      ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
-    if (object == null) {
+                                     ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
+    if (object == null) { // 原始Object对象==null，则返回SystemMetaObject.NULL_META_OBJECT 对象
       return SystemMetaObject.NULL_META_OBJECT;
     }
+    // 根据object创建MetaObject对象
     return new MetaObject(object, objectFactory, objectWrapperFactory, reflectorFactory);
   }
 
@@ -111,7 +116,9 @@ public class MetaObject {
   }
 
   public Object getValue(String name) {
+    // 创建 PropertyTokenizer 对象，对 name 分词
     PropertyTokenizer prop = new PropertyTokenizer(name);
+    // 调用 ObjectWrapper 的 get 方法，获取属性值
     return objectWrapper.get(prop);
   }
 
@@ -120,7 +127,9 @@ public class MetaObject {
   }
 
   public MetaObject metaObjectForProperty(String name) {
+    // 根据属性名称name获取对应的属性值，本质上也是调用objectWrapper的get方法
     Object value = getValue(name);
+    // 根据属性值，创建MetaObject对象
     return MetaObject.forObject(value, objectFactory, objectWrapperFactory, reflectorFactory);
   }
 
