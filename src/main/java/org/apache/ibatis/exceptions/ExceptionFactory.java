@@ -22,10 +22,17 @@ import org.apache.ibatis.executor.ErrorContext;
  */
 public class ExceptionFactory {
 
+  // 空参构造器
   private ExceptionFactory() {
     // Prevent Instantiation
   }
 
+  /**
+   * 静态方法，创建PersistenceException对象
+   * @param message 异常信息
+   * @param e 异常类
+   * @return PersistenceException对象
+   */
   public static RuntimeException wrapException(String message, Exception e) {
     return new PersistenceException(ErrorContext.instance().message(message).cause(e).toString(), e);
   }
