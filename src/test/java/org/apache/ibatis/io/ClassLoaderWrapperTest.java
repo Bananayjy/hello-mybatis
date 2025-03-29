@@ -25,10 +25,15 @@ import org.junit.jupiter.api.Test;
 
 class ClassLoaderWrapperTest extends BaseDataTest {
 
+  // 类加载器包装器对象
   private ClassLoaderWrapper wrapper;
+  // 类加载器
   private ClassLoader loader;
+  // 获取不到的资源
   private static final String RESOURCE_NOT_FOUND = "some_resource_that_does_not_exist.properties";
+  // 获取不到的class对象的全限定名称
   private static final String CLASS_NOT_FOUND = "some.random.class.that.does.not.Exist";
+  // 能够获取到的class对象的全限定名称
   private static final String CLASS_FOUND = "java.lang.Object";
 
   @BeforeEach

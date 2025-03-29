@@ -38,23 +38,29 @@ import org.junit.jupiter.api.Test;
  */
 
 class ResolverUtilTest {
+  // 当前上下文类加载器
   private static ClassLoader currentContextClassLoader;
 
   @BeforeAll
   static void setUp() {
+    // 当前上下文类加载器默认为当前线程的上下文类加载器
     currentContextClassLoader = Thread.currentThread().getContextClassLoader();
   }
 
   @Test
   void getClasses() {
+    // 没有调用find前，匹配结果集的matches数量就是0
     assertEquals(0, new ResolverUtil<>().getClasses().size());
   }
 
+  // 获取结果集
   @Test
   void getClassLoader() {
+    // 当前ResolverUtil中维护类加载器就是Thread.currentThread().getContextClassLoader();
     assertEquals(new ResolverUtil<>().getClassLoader(), currentContextClassLoader);
   }
 
+  // 设置结果集
   @Test
   void setClassLoader() {
     ResolverUtil resolverUtil = new ResolverUtil();
@@ -75,9 +81,12 @@ class ResolverUtilTest {
 
   @Test
   void findImplementations() {
+    // 创建ResolverUtil对象，并指定泛型，即要查找的结果集类型是VFS的子类对象或接口实现类
     ResolverUtil<VFS> resolverUtil = new ResolverUtil<>();
+    // 即在org.apache.ibatis.io包下查找VFS的子类或接口实现类
     resolverUtil.findImplementations(VFS.class, "org.apache.ibatis.io");
     Set<Class<? extends VFS>> classSets = resolverUtil.getClasses();
+    // 匹配到的结果集内容如下所示：
     // org.apache.ibatis.io.VFS
     // org.apache.ibatis.io.DefaultVFS
     // org.apache.ibatis.io.JBoss6VFS
@@ -94,6 +103,7 @@ class ResolverUtilTest {
 
   @Test
   void findAnnotated() {
+    // 创建ResolverUtil对象，并指定泛型，即要查找的结果集类型是VFS的子类对象或接口实现类
     ResolverUtil<Object> resolverUtil = new ResolverUtil<>();
     resolverUtil.findAnnotated(CacheNamespace.class, this.getClass().getPackage().getName());
     Set<Class<?>> classSets = resolverUtil.getClasses();
@@ -104,7 +114,9 @@ class ResolverUtilTest {
 
   @Test
   void find() {
+    // 创建ResolverUtil对象，并指定泛型，即要查找的结果集类型是VFS的子类对象或接口实现类
     ResolverUtil<VFS> resolverUtil = new ResolverUtil<>();
+    // 即在org.apache.ibatis.io包下查找VFS的子类或接口实现类
     resolverUtil.find(new ResolverUtil.IsA(VFS.class), "org.apache.ibatis.io");
     Set<Class<? extends VFS>> classSets = resolverUtil.getClasses();
     // org.apache.ibatis.io.VFS

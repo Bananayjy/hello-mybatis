@@ -34,6 +34,7 @@ class VFSTest {
     Assertions.assertNotNull(vsf);
   }
 
+  // 证明VFS是单例对象
   @Test
   void getInstanceShouldNotBeNullInMultiThreadEnv() throws InterruptedException {
     final int threadCount = 3;

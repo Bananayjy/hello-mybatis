@@ -32,20 +32,24 @@ import java.util.Properties;
  */
 public class Resources {
 
+  // 通过new实例化一个 ClassLoaderWrapper 对象
   private static final ClassLoaderWrapper classLoaderWrapper = new ClassLoaderWrapper();
 
   /**
    * Charset to use when calling getResourceAsReader. null means use the system default.
+   * 调用getResourceAsReader时使用的字符集。Null表示使用系统默认值。
    */
   private static Charset charset;
 
+  // 无参构造器（啥都不做……）
   private Resources() {
   }
 
   /**
    * Returns the default classloader (may be null).
+   * 获取默认的类加载器（可能为null）
    *
-   * @return The default classloader
+   * @return The default classloader 默认的类加载器
    */
   public static ClassLoader getDefaultClassLoader() {
     return classLoaderWrapper.defaultClassLoader;
@@ -53,6 +57,7 @@ public class Resources {
 
   /**
    * Sets the default classloader
+   * 修改默认的类加载器
    *
    * @param defaultClassLoader
    *          - the new default ClassLoader
@@ -62,7 +67,23 @@ public class Resources {
   }
 
   /**
+   * getResourceXxx方法：获得指定资源的 URL
+   * 下述有很多getResourceXxx获得指定的资源以Xxx形式，本质上都是调用classLoaderWrapper的方法，与部分需要封装成Xxx格式返回的
+   * 1、getResourceURL：获取指定资源url {@link Resources#getResourceURL(String)}.
+   * 2、getResourceAsStream
+   * 3、getResourceAsProperties
+   * 4、getResourceAsReader
+   * 5、getResourceAsFile
+   *
+   * getUrlXxx方法：根据 URL 以某种格式获取指定资源
+   * 1、getUrlAsStream：获取URL资源，并转换为流对象
+   * 2、getUrlAsProperties （调用getUrlAsStream获取Stream后，并转化为Properties格式）
+   * 3、getUrlAsReader（调用getUrlAsStream获取Stream后，并转化为Reader格式）
+   */
+
+  /**
    * Returns the URL of the resource on the classpath
+   * 获得指定资源的 URL
    *
    * @param resource
    *          The resource to find
@@ -91,6 +112,7 @@ public class Resources {
    *           If the resource cannot be found or read
    */
   public static URL getResourceURL(ClassLoader loader, String resource) throws IOException {
+    // 调用classLoaderWrapper的getResourceAsURL方法获得指定资源的 URL
     URL url = classLoaderWrapper.getResourceAsURL(resource, loader);
     if (url == null) {
       throw new IOException("Could not find resource " + resource);
@@ -100,6 +122,7 @@ public class Resources {
 
   /**
    * Returns a resource on the classpath as a Stream object
+   * 获得指定资源的 InputStream
    *
    * @param resource
    *          The resource to find
@@ -322,10 +345,12 @@ public class Resources {
     return classLoaderWrapper.classForName(className);
   }
 
+  // 获取字符集的getter方法
   public static Charset getCharset() {
     return charset;
   }
 
+  // 设置字符串的setter方法
   public static void setCharset(Charset charset) {
     Resources.charset = charset;
   }

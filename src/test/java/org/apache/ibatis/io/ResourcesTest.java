@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 class ResourcesTest extends BaseDataTest {
 
+  // 类加载器，默认为ResourcesTest的类加载器
   private static final ClassLoader CLASS_LOADER = ResourcesTest.class.getClassLoader();
 
   @Test
@@ -45,12 +46,6 @@ class ResourcesTest extends BaseDataTest {
   void shouldGetUrlAsProperties() throws Exception {
     URL url = Resources.getResourceURL(CLASS_LOADER, JPETSTORE_PROPERTIES);
     Properties props = Resources.getUrlAsProperties(url.toString());
-    assertNotNull(props.getProperty("driver"));
-  }
-
-  @Test
-  void shouldGetResourceAsProperties() throws Exception {
-    Properties props = Resources.getResourceAsProperties(CLASS_LOADER, JPETSTORE_PROPERTIES);
     assertNotNull(props.getProperty("driver"));
   }
 
@@ -68,6 +63,12 @@ class ResourcesTest extends BaseDataTest {
     try (Reader in = Resources.getUrlAsReader(url.toString())) {
       assertNotNull(in);
     }
+  }
+
+  @Test
+  void shouldGetResourceAsProperties() throws Exception {
+    Properties props = Resources.getResourceAsProperties(CLASS_LOADER, JPETSTORE_PROPERTIES);
+    assertNotNull(props.getProperty("driver"));
   }
 
   @Test
