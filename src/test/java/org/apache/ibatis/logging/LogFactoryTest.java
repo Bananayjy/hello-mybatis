@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 class LogFactoryTest {
 
+  //  当前测试类的所有测试方法执行完毕后运行一次
   @AfterAll
   static void restore() {
     LogFactory.useSlf4jLogging();
@@ -50,6 +51,7 @@ class LogFactoryTest {
   void shouldUseLog4J() {
     LogFactory.useLog4JLogging();
     Log log = LogFactory.getLog(Object.class);
+    System.out.println(log.isDebugEnabled());
     logSomething(log);
     assertEquals(log.getClass().getName(), Log4jImpl.class.getName());
   }
