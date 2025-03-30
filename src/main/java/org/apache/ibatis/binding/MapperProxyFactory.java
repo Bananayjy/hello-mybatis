@@ -24,25 +24,33 @@ import org.apache.ibatis.binding.MapperProxy.MapperMethodInvoker;
 import org.apache.ibatis.session.SqlSession;
 
 /**
+ * Mapper代理对象的工厂类
  * @author Lasse Voss
  */
 public class MapperProxyFactory<T> {
 
+  // mapper接口
   private final Class<T> mapperInterface;
+  // mapper方法对应的MapperMethodInvoker的映射（方法与 MapperMethod 的映射）
   private final Map<Method, MapperMethodInvoker> methodCache = new ConcurrentHashMap<>();
 
+  // 构造器
+  // 传入的mapper接口，并将其赋值给成员变量mapperInterface
   public MapperProxyFactory(Class<T> mapperInterface) {
     this.mapperInterface = mapperInterface;
   }
 
+  // 获取mapper接口
   public Class<T> getMapperInterface() {
     return mapperInterface;
   }
 
+  // 获取mapper方法对应的MapperMethodInvoker的映射
   public Map<Method, MapperMethodInvoker> getMethodCache() {
     return methodCache;
   }
 
+  // 创建 Mapper Proxy 对象 （JDK动态代理实现）
   @SuppressWarnings("unchecked")
   protected T newInstance(MapperProxy<T> mapperProxy) {
     return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);

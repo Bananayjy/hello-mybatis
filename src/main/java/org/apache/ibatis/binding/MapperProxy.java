@@ -36,21 +36,37 @@ import org.apache.ibatis.util.MapUtil;
  */
 public class MapperProxy<T> implements InvocationHandler, Serializable {
 
+  // 序列化UID
   private static final long serialVersionUID = -4724728412955527868L;
+
+  // 允许修饰符
   private static final int ALLOWED_MODES = MethodHandles.Lookup.PRIVATE | MethodHandles.Lookup.PROTECTED
       | MethodHandles.Lookup.PACKAGE | MethodHandles.Lookup.PUBLIC;
+
   private static final Constructor<Lookup> lookupConstructor;
   private static final Method privateLookupInMethod;
+
+  // SqlSession 对象
   private final SqlSession sqlSession;
+
+  // mapper接口
   private final Class<T> mapperInterface;
+
+  // mapper方法对应的MapperMethodInvoker的映射（方法与 MapperMethod 的映射）
   private final Map<Method, MapperMethodInvoker> methodCache;
 
+  // 构造器
   public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethodInvoker> methodCache) {
     this.sqlSession = sqlSession;
     this.mapperInterface = mapperInterface;
     this.methodCache = methodCache;
   }
 
+  // 用于初始化 JDK 方法句柄（MethodHandles）相关的反射工具，目的是为了支持 JDK 8 和更高版本的不同 API 差异
+  /**
+   * 1、检测当前 JDK 版本，选择合适的方式获取 MethodHandles.Lookup 对象
+   * 2、初始化两种可能的访问方式（适配 JDK 8 和 JDK 9+ 的 API 变化）
+   */
   static {
     Method privateLookupIn;
     try {
@@ -80,9 +96,10 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
-      if (Object.class.equals(method.getDeclaringClass())) {
+      if (Object.class.equals(method.getDeclaringClass())) {  // 如果是Object定义的方法直接调用
         return method.invoke(this, args);
       }
+      // 其他情况，先调用cachedInvoker方法，先将method封装成一个MapperMethodInvoker对象，然后调用其invoke方法
       return cachedInvoker(method).invoke(proxy, method, args, sqlSession);
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);
@@ -91,10 +108,12 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
 
   private MapperMethodInvoker cachedInvoker(Method method) throws Throwable {
     try {
+      // 遍历methodCache
       return MapUtil.computeIfAbsent(methodCache, method, m -> {
-        if (!m.isDefault()) {
+        if (!m.isDefault()) { // 如果不是默认方法
           return new PlainMethodInvoker(new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
         }
+        // 默认方法的处理逻辑，根据 privateLookupInMethod 的值来选择不同的获取方法句柄的方式
         try {
           if (privateLookupInMethod == null) {
             return new DefaultMethodInvoker(getMethodHandleJava8(method));
