@@ -49,6 +49,7 @@ public @interface CacheNamespace {
 
   /**
    * Returns the cache implementation type to use.
+   * 负责存储的 Cache 实现类
    *
    * @return the cache implementation type
    */
@@ -56,6 +57,7 @@ public @interface CacheNamespace {
 
   /**
    * Returns the cache evicting implementation type to use.
+   * 负责过期的 Cache 实现类
    *
    * @return the cache evicting implementation type
    */
@@ -63,6 +65,7 @@ public @interface CacheNamespace {
 
   /**
    * Returns the flush interval.
+   * 清空缓存的频率。0 代表不清空
    *
    * @return the flush interval
    */
@@ -70,6 +73,7 @@ public @interface CacheNamespace {
 
   /**
    * Return the cache size.
+   * 缓存容器大小
    *
    * @return the cache size
    */
@@ -77,6 +81,7 @@ public @interface CacheNamespace {
 
   /**
    * Returns whether use read/write cache.
+   * 是否序列化。{@link org.apache.ibatis.cache.decorators.SerializedCache}
    *
    * @return {@code true} if use read/write cache; {@code false} if otherwise
    */
@@ -84,6 +89,7 @@ public @interface CacheNamespace {
 
   /**
    * Returns whether block the cache at request time or not.
+   * 返回是否在请求时阻塞缓存。
    *
    * @return {@code true} if block the cache; {@code false} if otherwise
    */
@@ -91,6 +97,7 @@ public @interface CacheNamespace {
 
   /**
    * Returns property values for a implementation object.
+   * 返回实现对象的属性值
    *
    * @return property values
    *

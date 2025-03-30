@@ -60,6 +60,7 @@ import java.lang.annotation.Target;
 public @interface ResultMap {
   /**
    * Returns result map names to use.
+   * 返回要使用的结果映射名称。
    *
    * @return result map names
    */

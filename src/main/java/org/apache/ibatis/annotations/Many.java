@@ -36,6 +36,8 @@ import org.apache.ibatis.mapping.FetchType;
 public @interface Many {
   /**
    * Returns the columnPrefix.
+   * 列名前缀，用于去重和匹配关联对象的字段
+   * 示例："dept_"（会自动映射 dept_id → id）
    *
    * @return the columnPrefix.
    *
@@ -45,7 +47,8 @@ public @interface Many {
 
   /**
    * Returns the result map id used to map collection.
-   *
+   * 返回用于映射单个对象的结果映射id
+   * 即引用已定义的 <resultMap> 或 @Results 的 ID
    * @return the result map id
    *
    * @since 3.5.5
@@ -54,6 +57,8 @@ public @interface Many {
 
   /**
    * Returns the statement id that retrieves collection.
+   * 返回检索单个对象的语句id,即指定另一个 Mapper 方法的全限定名，用于查询关联对象
+   * 示例："com.example.mapper.DeptMapper.findById"
    *
    * @return the statement id
    */
@@ -61,6 +66,11 @@ public @interface Many {
 
   /**
    * Returns the fetch strategy for nested statement.
+   * 返回嵌套语句的获取策略。
+   * 加载策略：
+   * - LAZY（延迟加载）
+   * - EAGER（立即加载）
+   * - DEFAULT（全局配置）
    *
    * @return the fetch strategy
    */

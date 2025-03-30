@@ -40,6 +40,7 @@ import org.apache.ibatis.type.UnknownTypeHandler;
 public @interface Result {
   /**
    * Returns whether id column or not.
+   *  是否是 ID 字段
    *
    * @return {@code true} if id column; {@code false} if otherwise
    */
@@ -47,6 +48,7 @@ public @interface Result {
 
   /**
    * Return the column name(or column label) to map to this argument.
+   * 返回列名（或列标签）以映射到此参数。
    *
    * @return the column name(or column label)
    */
@@ -54,6 +56,7 @@ public @interface Result {
 
   /**
    * Returns the property name for applying this mapping.
+   * 返回应用此映射的属性名称。
    *
    * @return the property name
    */
@@ -61,6 +64,7 @@ public @interface Result {
 
   /**
    * Return the java type for this argument.
+   * 返回该参数的java类型。
    *
    * @return the java type
    */
@@ -68,6 +72,7 @@ public @interface Result {
 
   /**
    * Return the jdbc type for column that map to this argument.
+   * 返回映射到该参数的列的jdbc类型。
    *
    * @return the jdbc type
    */
@@ -75,6 +80,7 @@ public @interface Result {
 
   /**
    * Returns the {@link TypeHandler} type for retrieving a column value from result set.
+   * 返回从结果集中检索列值的{@link TypeHandler}类型
    *
    * @return the {@link TypeHandler} type
    */
@@ -82,6 +88,7 @@ public @interface Result {
 
   /**
    * Returns the mapping definition for single relationship.
+   * 返回单个关系的映射定义。
    *
    * @return the mapping definition for single relationship
    */
@@ -89,6 +96,7 @@ public @interface Result {
 
   /**
    * Returns the mapping definition for collection relationship.
+   * 返回集合关系的映射定义。
    *
    * @return the mapping definition for collection relationship
    */

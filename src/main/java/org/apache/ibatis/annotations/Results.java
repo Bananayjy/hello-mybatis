@@ -47,6 +47,7 @@ import java.lang.annotation.Target;
 public @interface Results {
   /**
    * Returns the id of this result map.
+   * 返回结果映射的id。
    *
    * @return the id of this result map
    */
@@ -54,6 +55,7 @@ public @interface Results {
 
   /**
    * Returns mapping definitions for property.
+   * 返回属性的映射定义。
    *
    * @return mapping definitions
    */

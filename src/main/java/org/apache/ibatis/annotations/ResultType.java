@@ -45,6 +45,7 @@ import java.lang.annotation.Target;
 public @interface ResultType {
   /**
    * Returns the return type.
+   * 返回类型
    *
    * @return the return type
    */

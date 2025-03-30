@@ -42,6 +42,7 @@ import java.lang.annotation.Target;
 public @interface MapKey {
   /**
    * Returns the property name(or column name) for a key value of {@link java.util.Map}.
+   * 返回{@link java.util.Map}键值的属性名（或列名）
    *
    * @return the property name(or column name)
    */

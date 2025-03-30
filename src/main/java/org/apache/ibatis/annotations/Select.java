@@ -61,6 +61,7 @@ import java.lang.annotation.Target;
 public @interface Select {
   /**
    * Returns an SQL for retrieving record(s).
+   * 返回用于检索记录的SQL
    *
    * @return an SQL for retrieving record(s)
    */
@@ -68,6 +69,8 @@ public @interface Select {
 
   /**
    * @return A database id that correspond this statement
+   * 与此语句对应的数据库id
+   * 用于多数据库支持的特性，允许你为不同的数据库编写特定的 SQL 语句
    *
    * @since 3.5.5
    */
@@ -76,6 +79,8 @@ public @interface Select {
   /**
    * Returns whether this select affects DB data.<br>
    * e.g. RETURNING of PostgreSQL or OUTPUT of MS SQL Server.
+   * 返回此选择是否影响DB数据。
+   * 例如：PostgreSQL的return或MS SQL Server的OUTPUT。
    *
    * @return {@code true} if this select affects DB data; {@code false} if otherwise
    *
@@ -85,6 +90,7 @@ public @interface Select {
 
   /**
    * The container annotation for {@link Select}.
+   * Select的容器式注解
    *
    * @author Kazuki Shimizu
    *

@@ -36,6 +36,7 @@ public @interface Property {
 
   /**
    * Returns the property name.
+   * 属性名
    *
    * @return the property name
    */
@@ -43,6 +44,7 @@ public @interface Property {
 
   /**
    * Returns the property value or placeholder.
+   * 返回属性值或占位符
    *
    * @return the property value or placeholder
    */

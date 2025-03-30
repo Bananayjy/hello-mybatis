@@ -43,6 +43,7 @@ import java.lang.annotation.Target;
 public @interface Update {
   /**
    * Returns an SQL for updating record(s).
+   * 返回用于更新记录的SQL
    *
    * @return an SQL for updating record(s)
    */
@@ -50,13 +51,15 @@ public @interface Update {
 
   /**
    * @return A database id that correspond this statement
-   *
+   * 此语句对应的数据库id
+   * 用于多数据库支持的特性，允许你为不同的数据库编写特定的 SQL 语句
    * @since 3.5.5
    */
   String databaseId() default "";
 
   /**
    * The container annotation for {@link Update}.
+   * Update的容器式注解
    *
    * @author Kazuki Shimizu
    *

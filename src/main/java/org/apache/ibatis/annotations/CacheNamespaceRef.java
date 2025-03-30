@@ -45,6 +45,7 @@ public @interface CacheNamespaceRef {
 
   /**
    * Returns the namespace type to reference a cache (the namespace name become a FQCN of specified type).
+   * 返回引用缓存的命名空间类型
    *
    * @return the namespace type to reference a cache
    */
@@ -52,6 +53,7 @@ public @interface CacheNamespaceRef {
 
   /**
    * Returns the namespace name to reference a cache.
+   * 返回用于引用缓存的命名空间名称。
    *
    * @return the namespace name
    *

@@ -46,6 +46,7 @@ import org.apache.ibatis.mapping.StatementType;
 public @interface SelectKey {
   /**
    * Returns an SQL for retrieving a key value.
+   * 获取键值的 SQL 语句（如查询序列或触发器的 SQL）
    *
    * @return an SQL for retrieving a key value
    */
@@ -53,6 +54,7 @@ public @interface SelectKey {
 
   /**
    * Returns property names that holds a key value.
+   * 将键值赋给参数对象的哪个属性（支持逗号分隔多个属性）
    * <p>
    * If you specify multiple property, please separate using comma(',').
    *
@@ -62,6 +64,7 @@ public @interface SelectKey {
 
   /**
    * Returns column names that retrieves a key value.
+   * 数据库中的键列名（当列名与属性名不一致时指定）
    * <p>
    * If you specify multiple column, please separate using comma(',').
    *
@@ -71,6 +74,7 @@ public @interface SelectKey {
 
   /**
    * Returns whether retrieves a key value before executing insert/update statement.
+   * true：在插入/更新前执行；false：在插入/更新后执行。
    *
    * @return {@code true} if execute before; {@code false} if otherwise
    */
@@ -78,6 +82,7 @@ public @interface SelectKey {
 
   /**
    * Returns the key value type.
+   * 键值的数据类型（如 Long.class、String.class）
    *
    * @return the key value type
    */
@@ -85,6 +90,7 @@ public @interface SelectKey {
 
   /**
    * Returns the statement type to use.
+   * SQL 执行方式（默认 PREPARED，可选 STATEMENT/CALLABLE）
    *
    * @return the statement type
    */
@@ -92,6 +98,7 @@ public @interface SelectKey {
 
   /**
    * @return A database id that correspond this select key
+   * 指定数据库厂商 ID（用于多数据库支持）
    *
    * @since 3.5.5
    */
@@ -99,6 +106,7 @@ public @interface SelectKey {
 
   /**
    * The container annotation for {@link SelectKey}.
+   * SelectKey的容器式注解
    *
    * @author Kazuki Shimizu
    *
