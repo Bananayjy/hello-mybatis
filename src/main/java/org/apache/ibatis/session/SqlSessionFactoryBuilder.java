@@ -26,12 +26,17 @@ import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 
 /**
+ * MyBatis 的初始化流程的入口
+ *
  * Builds {@link SqlSession} instances.
  *
  * @author Clinton Begin
  */
 public class SqlSessionFactoryBuilder {
 
+  /**
+   * build的重载方法，最终调用的都{@link SqlSessionFactoryBuilder#build(Reader, String, Properties)}方法
+   */
   public SqlSessionFactory build(Reader reader) {
     return build(reader, null, null);
   }
@@ -44,15 +49,27 @@ public class SqlSessionFactoryBuilder {
     return build(reader, null, properties);
   }
 
+  /**
+   * 构造 SqlSessionFactory 对象
+   * @param reader Reader 对象
+   * @param environment 环境信息
+   * @param properties properties变量
+   * @return SqlSessionFactory 工厂对象
+   */
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
+      // 1.创建XMLConfigBuilder对象
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
+      // 2.parse.parse():执行 XML 解析，返回 Configuration 对象
+      // 3.build: 创建 DefaultSqlSessionFactory 对象
       return build(parser.parse());
-    } catch (Exception e) {
+    } catch (Exception e) { // 创建SqlSession异常，抛出相关异常信息
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);
     } finally {
+      // 重置ErrorContext对象
       ErrorContext.instance().reset();
       try {
+        // 关闭readder对象
         if (reader != null) {
           reader.close();
         }
@@ -62,6 +79,10 @@ public class SqlSessionFactoryBuilder {
     }
   }
 
+
+  /**
+   * build的重载方法，最终调用的都{@link SqlSessionFactoryBuilder#build(InputStream, String, Properties)}方法
+   */
   public SqlSessionFactory build(InputStream inputStream) {
     return build(inputStream, null, null);
   }
@@ -74,9 +95,24 @@ public class SqlSessionFactoryBuilder {
     return build(inputStream, null, properties);
   }
 
+
+  /**
+   * 构造 SqlSessionFactory 对象，本质和 {@link SqlSessionFactoryBuilder#build(Reader, String, Properties)}方法一样
+   * 只不过获取创建 XMLConfigBuilder 对象的时候使用的输入数据的类型不同，一个使用 Reader，另一个使用
+   * - Reader 是 Java 中用于读取字符流的类，通常用于处理文本数据，如 XML 配置文件（UTF-8 编码等）
+   * - InputStream 是 Java 中用于读取字节流的类，通常用于处理二进制数据，如从文件、网络或其他来源读取字节数据
+   *
+   * @param inputStream 输入流对象
+   * @param environment 环境信息
+   * @param properties properties变量
+   * @return SqlSessionFactory 工厂对象
+   */
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
+      // 1.创建XMLConfigBuilder对象
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+      // 2.parse.parse():执行 XML 解析，返回 Configuration 对象
+      // 3.build: 创建 DefaultSqlSessionFactory 对象
       return build(parser.parse());
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);
@@ -92,6 +128,12 @@ public class SqlSessionFactoryBuilder {
     }
   }
 
+
+  /**
+   * 创建DefaultSqlSessionFactory 对象
+   * @param config Configuration 对象
+   * @return DefaultSqlSessionFactory 对象
+   */
   public SqlSessionFactory build(Configuration config) {
     return new DefaultSqlSessionFactory(config);
   }
