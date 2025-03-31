@@ -129,6 +129,7 @@ public class ParamNameResolver {
   /**
    * A single non-special parameter is returned without a name. Multiple parameters are named using the naming rule. In
    * addition to the default names, this method also adds the generic names (param1, param2, ...).
+   * 返回一个没有名称的非特殊参数。多个参数使用命名规则命名。除了默认名称之外，该方法还添加了泛型名称（param1, param2，…）
    *
    * @param args
    *          the args
@@ -146,7 +147,7 @@ public class ParamNameResolver {
       return wrapToMapIfCollection(value, useActualParamName ? names.get(names.firstKey()) : null);
     } else {
       // 集合。
-      // 组合 1 ：KEY：参数名，VALUE：参数值
+      // 组合 1 ：KEY：参数名（names中存储的参数名），VALUE：参数值
       // 组合 2 ：KEY：GENERIC_NAME_PREFIX + 参数顺序，VALUE ：参数值
       final Map<String, Object> param = new ParamMap<>();
       int i = 0;

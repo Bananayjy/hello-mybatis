@@ -100,6 +100,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         return method.invoke(this, args);
       }
       // 其他情况，先调用cachedInvoker方法，先将method封装成一个MapperMethodInvoker对象，然后调用其invoke方法
+      // invoke方法本质上调用MapperMethod对象的execute方法
       return cachedInvoker(method).invoke(proxy, method, args, sqlSession);
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);

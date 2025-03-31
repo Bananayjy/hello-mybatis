@@ -38,6 +38,7 @@ public abstract class BaseDataTest {
   public static final String JPETSTORE_DDL = "org/apache/ibatis/databases/jpetstore/jpetstore-hsqldb-schema.sql";
   public static final String JPETSTORE_DATA = "org/apache/ibatis/databases/jpetstore/jpetstore-hsqldb-dataload.sql";
 
+  // 创建无连接池的数据源
   public static UnpooledDataSource createUnpooledDataSource(String resource) throws IOException {
     Properties props = Resources.getResourceAsProperties(resource);
     UnpooledDataSource ds = new UnpooledDataSource();
@@ -48,6 +49,7 @@ public abstract class BaseDataTest {
     return ds;
   }
 
+  // 创建有连接池的数据源
   public static PooledDataSource createPooledDataSource(String resource) throws IOException {
     Properties props = Resources.getResourceAsProperties(resource);
     PooledDataSource ds = new PooledDataSource();
@@ -58,6 +60,7 @@ public abstract class BaseDataTest {
     return ds;
   }
 
+  // 执行脚本
   public static void runScript(DataSource ds, String resource) throws IOException, SQLException {
     try (Connection connection = ds.getConnection()) {
       ScriptRunner runner = new ScriptRunner(connection);
@@ -76,8 +79,11 @@ public abstract class BaseDataTest {
   }
 
   public static DataSource createBlogDataSource() throws IOException, SQLException {
+    // 创建无连接池的数据源（使用内存数据库：Derby 数据库）
     DataSource ds = createUnpooledDataSource(BLOG_PROPERTIES);
+    // 运行 DDL SQL脚本：建库建表
     runScript(ds, BLOG_DDL);
+    // 运行 DATA SQL脚本：插入数据
     runScript(ds, BLOG_DATA);
     return ds;
   }

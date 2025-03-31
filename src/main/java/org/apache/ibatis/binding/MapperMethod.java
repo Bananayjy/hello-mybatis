@@ -256,14 +256,17 @@ public class MapperMethod {
       }
     }
 
+    // 获取name成员变量，即MappedStatement#getId()
     public String getName() {
       return name;
     }
 
+    // 获取SQL 命令类型
     public SqlCommandType getType() {
       return type;
     }
 
+    // 获得 MappedStatement 对象
     private MappedStatement resolveMappedStatement(Class<?> mapperInterface, String methodName, Class<?> declaringClass,
         Configuration configuration) {
       // 获取 MappedStatement的id ，即 ${NAMESPACE_NAME}.${语句_ID}
@@ -275,7 +278,7 @@ public class MapperMethod {
       if (mapperInterface.equals(declaringClass)) { // 如果没有，并且当前方法就是 declaringClass 声明的，则说明真的找不到（不用向上找了）
         return null;
       }
-      // 遍历父接口，继续获得 MappedStatement 对象
+      // 遍历父接口，递归父接口获得 MappedStatement 对象（该方法定义在父接口中）
       for (Class<?> superInterface : mapperInterface.getInterfaces()) {
         if (declaringClass.isAssignableFrom(superInterface)) {
           MappedStatement ms = resolveMappedStatement(superInterface, methodName, declaringClass, configuration);
@@ -323,17 +326,27 @@ public class MapperMethod {
       } else { // 内部类等等
         this.returnType = method.getReturnType();
       }
+      // 初始化 returnsVoid 属性：判断返回类似是否为void
       this.returnsVoid = void.class.equals(this.returnType);
+      // 初始化 returnsMany 属性
       this.returnsMany = configuration.getObjectFactory().isCollection(this.returnType) || this.returnType.isArray();
+      // 初始化 returnsCursor 属性
       this.returnsCursor = Cursor.class.equals(this.returnType);
+      // 初始化 returnsOptional 属性
       this.returnsOptional = Optional.class.equals(this.returnType);
+      // 获得注解的 @MapKey的value()值，并初始化mapKey
       this.mapKey = getMapKey(method);
+      // 初始化 returnsMap 属性
       this.returnsMap = this.mapKey != null;
+      // 初始化rowBoundsIndex：获取RowBounds在方法参数中的位置（如果为 null ，说明不存在这个类型）
       this.rowBoundsIndex = getUniqueParamIndex(method, RowBounds.class);
+     // 初始化ResultHandler：获得ResultHandler}在方法参数中的位置（如果为 null ，说明不存在这个类型）
       this.resultHandlerIndex = getUniqueParamIndex(method, ResultHandler.class);
+      // 初始化 ParamNameResolver 对象
       this.paramNameResolver = new ParamNameResolver(configuration, method);
     }
 
+    // 获得 SQL 通用参数映射
     public Object convertArgsToSqlCommandParam(Object[] args) {
       return paramNameResolver.getNamedParams(args);
     }

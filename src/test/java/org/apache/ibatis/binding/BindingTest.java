@@ -70,24 +70,48 @@ import org.junit.jupiter.api.Test;
 class BindingTest {
   private static SqlSessionFactory sqlSessionFactory;
 
+  // 在所有测试单元执行前执行
   @BeforeAll
   static void setup() throws Exception {
+    // 创建数据源对象
     DataSource dataSource = BaseDataTest.createBlogDataSource();
+    // 传入数据源和一个名为 BLOG_DDL 的 SQL 脚本。这个方法会在数据库上执行 BLOG_DDL 脚本，通常这个脚本包含数据库的表结构定义（DDL），比如创建表、索引、约束等。
     BaseDataTest.runScript(dataSource, BaseDataTest.BLOG_DDL);
+    // 传入 BLOG_DATA 脚本。这个脚本通常包含测试数据的插入（DML），它会向数据库中插入一些数据
     BaseDataTest.runScript(dataSource, BaseDataTest.BLOG_DATA);
+    // 建一个 JdbcTransactionFactory 的实例，它是 MyBatis 中用于创建事务对象的工厂。JdbcTransactionFactory 使用 JDBC 来管理数据库事务
     TransactionFactory transactionFactory = new JdbcTransactionFactory();
+    /**
+     * 创建一个 Environment 对象，表示 MyBatis 的运行环境。Environment 定义了数据库连接、事务管理等设置
+     * "Production"：环境的名称，通常是一个标识，用来区分不同的环境（比如开发、测试、生产等环境）。
+     * transactionFactory：事务工厂，用于创建数据库事务。
+     * dataSource：数据源，用于提供数据库连接
+     */
     Environment environment = new Environment("Production", transactionFactory, dataSource);
+    /**
+     * 创建一个 Configuration 对象，表示 MyBatis 的配置信息。通过这个配置，MyBatis 会知道如何与数据库交互，如何管理事务、缓存等
+     * 在创建 Configuration 时，将前面创建的 environment 传入，告诉 MyBatis 使用哪个数据库环境和事务管理
+     */
     Configuration configuration = new Configuration(environment);
+    // 这行代码启用 MyBatis 的延迟加载功能。延迟加载（Lazy Loading）意味着在访问某个对象的属性时，才会加载该属性的数据，
+    // 而不是在查询时立即加载所有数据。这有助于提高性能，特别是在处理大量数据时。
     configuration.setLazyLoadingEnabled(true);
+    // 设置 UseActualParamName 为 false，表示 MyBatis 在 SQL 映射中使用 #{0} 和 #{1} 等位置参数风格来传递参数，而不是使用参数的实际名字
     configuration.setUseActualParamName(false); // to test legacy style reference (#{0} #{1})
+    // 注册别名，类型别名可以让我们在 SQL 映射文件中使用简短的类名，而不是使用完整的类名
     configuration.getTypeAliasRegistry().registerAlias(Blog.class);
     configuration.getTypeAliasRegistry().registerAlias(Post.class);
     configuration.getTypeAliasRegistry().registerAlias(Author.class);
+    // 注册类作为 MyBatis 的映射器（Mapper），Mapper 是 MyBatis 中的接口，用于定义数据库操作（如查询、插入、更新等）。通过注册这些 Mapper，
+    // MyBatis 会在后续的操作中自动映射数据库中的记录到对应的 Java 对象。
     configuration.addMapper(BoundBlogMapper.class);
     configuration.addMapper(BoundAuthorMapper.class);
+    // 使用 SqlSessionFactoryBuilder 来构建 SqlSessionFactory 实例。SqlSessionFactory 是 MyBatis 的核心对象，
+    // 提供了创建 SqlSession 的方法，SqlSession 用于执行 SQL 操作。
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
   }
 
+  // 测试是否能够通过BoundBlogMapper获取到对应的博客信息
   @Test
   void shouldSelectBlogWithPostsUsingSubSelect() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
