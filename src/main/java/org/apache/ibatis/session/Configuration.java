@@ -929,6 +929,7 @@ public class Configuration {
     return sqlFragments;
   }
 
+  // 将当前插件添加到控制器链中
   public void addInterceptor(Interceptor interceptor) {
     interceptorChain.addInterceptor(interceptor);
   }
@@ -938,6 +939,7 @@ public class Configuration {
   }
 
   public void addMappers(String packageName) {
+    // 扫描包packgeName下的所有Mapper接口，并添加到mapperRegistry中去
     mapperRegistry.addMappers(packageName);
   }
 

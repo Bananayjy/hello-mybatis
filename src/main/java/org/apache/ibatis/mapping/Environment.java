@@ -20,13 +20,18 @@ import javax.sql.DataSource;
 import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
+ * DB 环境相关信息存放于该类中
  * @author Clinton Begin
  */
 public final class Environment {
+  // 环境id
   private final String id;
+  // TransactionFactory 事务工厂对象
   private final TransactionFactory transactionFactory;
+  // DataSource 数据源对象
   private final DataSource dataSource;
 
+  // 构造函数
   public Environment(String id, TransactionFactory transactionFactory, DataSource dataSource) {
     if (id == null) {
       throw new IllegalArgumentException("Parameter 'id' must not be null");
@@ -42,9 +47,13 @@ public final class Environment {
     this.dataSource = dataSource;
   }
 
+  // 构造器
   public static class Builder {
+    // 环境id
     private final String id;
+    // TransactionFactory 事务工厂对象
     private TransactionFactory transactionFactory;
+    // DataSource 数据源对象
     private DataSource dataSource;
 
     public Builder(String id) {

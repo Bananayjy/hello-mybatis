@@ -42,6 +42,7 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
       throw new NullPointerException("dataSource cannot be null");
     }
     try {
+      // 获得数据库标识
       return getDatabaseName(dataSource);
     } catch (SQLException e) {
       throw new BuilderException("Error occurred when getting DB product name.", e);
@@ -54,16 +55,21 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
   }
 
   private String getDatabaseName(DataSource dataSource) throws SQLException {
+    // 获取数据库产品名称
     String productName = getDatabaseProductName(dataSource);
     if (properties == null || properties.isEmpty()) {
-      return productName;
+      return productName; // 如果没有配置，直接返回数据库产品名称
     }
+
+    // 如果产品名包含 KEY ，则返回对应的 VALUE
     return properties.entrySet().stream().filter(entry -> productName.contains((String) entry.getKey()))
         .map(entry -> (String) entry.getValue()).findFirst().orElse(null);
   }
 
   private String getDatabaseProductName(DataSource dataSource) throws SQLException {
+    // 获得数据库连接
     try (Connection con = dataSource.getConnection()) {
+      // 获得数据库产品名
       return con.getMetaData().getDatabaseProductName();
     }
   }
