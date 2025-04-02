@@ -20,8 +20,10 @@ package org.apache.ibatis.mapping;
  */
 public enum ResultFlag {
 
+  // ID
   ID,
 
+  // 构造方法
   CONSTRUCTOR
 
 }

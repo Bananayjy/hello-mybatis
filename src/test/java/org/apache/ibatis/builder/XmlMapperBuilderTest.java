@@ -34,16 +34,24 @@ import org.apache.ibatis.type.TypeHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+// Mapper 映射配置文件的解析
 class XmlMapperBuilderTest {
 
+  // 成功加载 Mapper 映射配置文件
   @Test
   void shouldSuccessfullyLoadXMLMapperFile() {
+    // 断言，没有抛出异常
     assertDoesNotThrow(() -> {
+      // MyBatis 配置类
       Configuration configuration = new Configuration();
+      // Mapper 映射配置文件地址
       String resource = "org/apache/ibatis/builder/AuthorMapper.xml";
+      // 通过Resources获取Mapper映射配置文件资源，并转化为输入流
       try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
+        // 创建 Mapper XML 配置构建器对象
         XMLMapperBuilder builder = new XMLMapperBuilder(inputStream, configuration, resource,
             configuration.getSqlFragments());
+        // 解析 Mapper 映射配置文件
         builder.parse();
       }
     });

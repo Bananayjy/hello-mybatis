@@ -98,10 +98,12 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * MyBatis 配置类
  * @author Clinton Begin
  */
 public class Configuration {
 
+  // DB 环境相关信息 对象
   protected Environment environment;
 
   protected boolean safeRowBoundsEnabled;
@@ -164,6 +166,7 @@ public class Configuration {
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
   protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
 
+  // 维护已加载资源( Resource )集合
   protected final Set<String> loadedResources = new HashSet<>();
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers");
   protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
@@ -179,6 +182,9 @@ public class Configuration {
   /*
    * A map holds cache-ref relationship. The key is the namespace that references a cache bound to another namespace and
    * the value is the namespace which the actual cache is bound to.
+   * Cache 指向的映射
+   * map拥有cache-ref关系。键是引用绑定到另一个命名空间的缓存的命名空间，值是实际缓存绑定到的命名空间。
+   *
    */
   protected final Map<String, String> cacheRefMap = new HashMap<>();
 
@@ -387,6 +393,8 @@ public class Configuration {
     loadedResources.add(resource);
   }
 
+  // 判断当前 Mapper 是否已经加载过
+  // loadedResources对象：已加载资源( Resource )集合
   public boolean isResourceLoaded(String resource) {
     return loadedResources.contains(resource);
   }
@@ -782,6 +790,8 @@ public class Configuration {
     return caches.values();
   }
 
+  // 获得 Cache 对象
+  // id：命名空间 namespace
   public Cache getCache(String id) {
     return caches.get(id);
   }
@@ -791,8 +801,11 @@ public class Configuration {
   }
 
   public void addResultMap(ResultMap rm) {
+    // 添加到 resultMaps 中
     resultMaps.put(rm.getId(), rm);
+    // 遍历全局的 ResultMap 集合，若其拥有 Discriminator 对象，则判断是否强制标记为有内嵌的 ResultMap
     checkLocallyForDiscriminatedNestedResultMaps(rm);
+    // 若传入的 ResultMap 不存在内嵌 ResultMap 并且有 Discriminator ，则判断是否需要强制表位有内嵌的 ResultMap
     checkGloballyForDiscriminatedNestedResultMaps(rm);
   }
 
@@ -1000,6 +1013,7 @@ public class Configuration {
     }
   }
 
+  // 获得 XMLStatementBuilder 集合，并遍历进行处理
   public void parsePendingStatements(boolean reportUnresolved) {
     if (incompleteStatements.isEmpty()) {
       return;
@@ -1019,6 +1033,7 @@ public class Configuration {
     }
   }
 
+  // 获得 CacheRefResolver 集合，并遍历进行处理
   public void parsePendingCacheRefs(boolean reportUnresolved) {
     if (incompleteCacheRefs.isEmpty()) {
       return;
@@ -1045,17 +1060,22 @@ public class Configuration {
       IncompleteElementException ex = null;
       do {
         resolved = false;
+        // 获得 ResultMapResolver 集合，并遍历进行处理
         Iterator<ResultMapResolver> iterator = incompleteResultMaps.iterator();
         while (iterator.hasNext()) {
           try {
+            // 执行解析
             iterator.next().resolve();
+            // 移除
             iterator.remove();
             resolved = true;
           } catch (IncompleteElementException e) {
+            // 解析失败，不抛出异常
             ex = e;
           }
         }
       } while (resolved);
+      // 是否抛出异常
       if (reportUnresolved && !incompleteResultMaps.isEmpty() && ex != null) {
         // At least one result map is unresolvable.
         throw ex;
@@ -1079,6 +1099,7 @@ public class Configuration {
   }
 
   // Slow but a one time cost. A better solution is welcome.
+  // 若传入的 ResultMap 不存在内嵌 ResultMap 并且有 Discriminator ，则判断是否需要强制表位有内嵌的 ResultMap
   protected void checkGloballyForDiscriminatedNestedResultMaps(ResultMap rm) {
     if (rm.hasNestedResultMaps()) {
       final String resultMapId = rm.getId();
@@ -1098,10 +1119,15 @@ public class Configuration {
   }
 
   // Slow but a one time cost. A better solution is welcome.
+  // 遍历全局的 ResultMap 集合，若其拥有 Discriminator 对象，则判断是否强制标记为有内嵌的 ResultMap
   protected void checkLocallyForDiscriminatedNestedResultMaps(ResultMap rm) {
+    // // 如果传入的 ResultMap 有内嵌的 ResultMap 并且 拥有 Discriminator 对象
     if (!rm.hasNestedResultMaps() && rm.getDiscriminator() != null) {
+      // 遍历全局的 ResultMap 集合
       for (String discriminatedResultMapName : rm.getDiscriminator().getDiscriminatorMap().values()) {
         if (hasResultMap(discriminatedResultMapName)) {
+          // 判断是否 Discriminator 的 ResultMap 集合中，使用了传入的 ResultMap 。
+          // 如果是，则标记为有内嵌的 ResultMap
           ResultMap discriminatedResultMap = resultMaps.get(discriminatedResultMapName);
           if (discriminatedResultMap.hasNestedResultMaps()) {
             rm.forceNestedResultMaps();

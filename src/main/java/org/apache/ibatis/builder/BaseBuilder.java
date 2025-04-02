@@ -48,7 +48,9 @@ public abstract class BaseBuilder {
    */
   public BaseBuilder(Configuration configuration) {
     this.configuration = configuration;
+    // typeAliasRegistry对象维护configuration配置对象中typeAliasRegistry的引用
     this.typeAliasRegistry = this.configuration.getTypeAliasRegistry();
+    // typeHandlerRegistry对象维护configuration配置对象中typeHandlerRegistry的引用
     this.typeHandlerRegistry = this.configuration.getTypeHandlerRegistry();
   }
 

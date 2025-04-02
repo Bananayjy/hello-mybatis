@@ -21,14 +21,20 @@ import org.apache.ibatis.cache.Cache;
  * @author Clinton Begin
  */
 public class CacheRefResolver {
+
+  // MapperBuilderAssistant 是一个辅助类，用于创建 Mapper 映射文件
   private final MapperBuilderAssistant assistant;
+
+  // Cache指向的命名空间（mapper标签旁的命名空间）
   private final String cacheRefNamespace;
 
+  // 构造函数
   public CacheRefResolver(MapperBuilderAssistant assistant, String cacheRefNamespace) {
     this.assistant = assistant;
     this.cacheRefNamespace = cacheRefNamespace;
   }
 
+  // 获取指向的Cache对象
   public Cache resolveCacheRef() {
     return assistant.useCacheRef(cacheRefNamespace);
   }
