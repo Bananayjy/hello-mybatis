@@ -67,7 +67,7 @@ public class MapperRegistry {
   }
 
   /**
-   * 将符合的类，添加到 knownMappers 中
+   * 将符合的类，添加到 knownMappers （MapperRegistry被Configuration配置类维护）
    * @param type 需要添加的类对象
    */
   public <T> void addMapper(Class<T> type) {
@@ -83,7 +83,7 @@ public class MapperRegistry {
         // It's important that the type is added before the parser is run 在解析器运行之前添加类型是很重要的
         // otherwise the binding may automatically be attempted by the 方法可能会自动尝试绑定
         // mapper parser. If the type is already known, it won't try. 映射器解析器。如果类型是已知的，它就不会尝试
-        // 解析Mapper的注解配置
+        // 通过MapperAnnotationBuilder对象解析Mapper接口的注解配置
         // 创建MapperAnnotationBuilder对象
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
         // 调用MapperAnnotationBuilder对象的parse方法对注解进行解析

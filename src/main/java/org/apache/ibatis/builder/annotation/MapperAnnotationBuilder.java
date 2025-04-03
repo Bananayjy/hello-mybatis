@@ -90,6 +90,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
+ * Mapper接口注解解析的构造器
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -113,18 +114,26 @@ public class MapperAnnotationBuilder {
 
   public void parse() {
     String resource = type.toString();
-    if (!configuration.isResourceLoaded(resource)) {
+    if (!configuration.isResourceLoaded(resource)) {  // 判断当前Mapper接口是否已经加载
+      // 看下对应的mapper xml映射配置文件是否解析，没有解析先进行xml的解析
       loadXmlResource();
+      // 设置当前Mapper接口资源已经被加载
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());
+      // 解析Cache注解（本质上使用MapperBuilderAssistant的useNewCache方法）
       parseCache();
+      // 解析CacheRef注解（本质上使用MapperBuilderAssistant的useCacheRef方法）
       parseCacheRef();
+      // 遍历当前Mapper接口中的所有方法
       for (Method method : type.getMethods()) {
+        // 判断如果当前对象是bridge方法或是默认方法则跳过
         if (!canHaveStatement(method)) {
           continue;
         }
+        // 如果当前方法使用了@Select注解或是@SelectProvider注解且没有使用@ResultMap注解，则进行ResultMap的解析
         if (getAnnotationWrapper(method, false, Select.class, SelectProvider.class).isPresent()
             && method.getAnnotation(ResultMap.class) == null) {
+          // 解析 ResultMap
           parseResultMap(method);
         }
         try {
@@ -209,20 +218,35 @@ public class MapperAnnotationBuilder {
   }
 
   private String parseResultMap(Method method) {
+    // 获取当前返回类型
     Class<?> returnType = getReturnType(method, type);
     Arg[] args = method.getAnnotationsByType(Arg.class);
     Result[] results = method.getAnnotationsByType(Result.class);
     TypeDiscriminator typeDiscriminator = method.getAnnotation(TypeDiscriminator.class);
+    // 生成resultMap的名称
     String resultMapId = generateResultMapName(method);
+    // 将注解的结果映射信息存到configuration配置对象的ResultMap中
     applyResultMap(resultMapId, returnType, args, results, typeDiscriminator);
     return resultMapId;
   }
 
+  // 生成resultMap的名称
   private String generateResultMapName(Method method) {
     Results results = method.getAnnotation(Results.class);
+    // @Results不为空，且@Results注解中的id不为空
+    // 则使用返回参数类型的全限定名称 + “.” + @Results注解的id作为名称
     if (results != null && !results.id().isEmpty()) {
       return type.getName() + "." + results.id();
     }
+    // 如果没有@Results或者@Results注解中的id没有
+    // 那么使用返回参数类型的全限定名称 + “-” + 参数类型名称作为名称
+    /**
+     * eg：
+     * @Select("select")
+     * void selectAuthor2(int id, ResultHandler handler);
+   *   对应：
+     * org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor2-int-ResultHandler
+     */
     StringBuilder suffix = new StringBuilder();
     for (Class<?> c : method.getParameterTypes()) {
       suffix.append("-");
@@ -598,23 +622,31 @@ public class MapperAnnotationBuilder {
     return getAnnotationWrapper(method, errorIfNoMatch, Arrays.asList(targetTypes));
   }
 
+  // 根据指定的注解类型targetTypes，获取注解包装类
   private Optional<AnnotationWrapper> getAnnotationWrapper(Method method, boolean errorIfNoMatch,
       Collection<Class<? extends Annotation>> targetTypes) {
+    // 从当前配置对象获取数据库id
     String databaseId = configuration.getDatabaseId();
+    // 对当前方法上的注解转换映射（如果databaseId 重复，抛出异常）
+    // key：databaseId    value：AnnotationWrapper对象
     Map<String, AnnotationWrapper> statementAnnotations = targetTypes.stream()
-        .flatMap(x -> Arrays.stream(method.getAnnotationsByType(x))).map(AnnotationWrapper::new)
+      // 获取方法上所有 x 类型的注解（包括重复注解），将所有注解流合并成一个 Stream<Annotation>，相当于“扁平化”处理
+      .flatMap(x -> Arrays.stream(method.getAnnotationsByType(x)))
+      // 将每个 Annotation 封装成 AnnotationWrapper 对象
+      .map(AnnotationWrapper::new)
         .collect(Collectors.toMap(AnnotationWrapper::getDatabaseId, x -> x, (existing, duplicate) -> {
           throw new BuilderException(
               String.format("Detected conflicting annotations '%s' and '%s' on '%s'.", existing.getAnnotation(),
                   duplicate.getAnnotation(), method.getDeclaringClass().getName() + "." + method.getName()));
         }));
     AnnotationWrapper annotationWrapper = null;
-    if (databaseId != null) {
+    if (databaseId != null) { // 如果 databaseId 不为null，则从statementAnnotations映射中根据databaseId获取对应的AnnotationWrapper
       annotationWrapper = statementAnnotations.get(databaseId);
     }
-    if (annotationWrapper == null) {
+    if (annotationWrapper == null) { // 如果 databaseId 为null，则从statementAnnotations映射中根据databaseId = “”获取对应的AnnotationWrapper
       annotationWrapper = statementAnnotations.get("");
     }
+    // errorIfNoMatch==true，且annotationWrapper == null 且statementAnnotations映射不会空，则抛出异常
     if (errorIfNoMatch && annotationWrapper == null && !statementAnnotations.isEmpty()) {
       // Annotations exist, but there is no matching one for the specified databaseId
       throw new BuilderException(String.format(

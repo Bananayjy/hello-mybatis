@@ -516,7 +516,8 @@ public class XMLMapperBuilder extends BaseBuilder {
         // Spring may not know the real resource name so we set a flag
         // to prevent loading again this resource from the mapper interface
         // look at MapperAnnotationBuilder#loadXmlResource
-        // 标记 namespace 已经添加，避免 MapperAnnotationBuilder#loadXmlResource(...) 重复加载
+        // 标记 该接口 已经添加（通过在配置对象中的loadedResources对象中加入“namespace”+namespace），
+        // 避免 MapperAnnotationBuilder#loadXmlResource(...) 重复加载
         configuration.addLoadedResource("namespace:" + namespace);
         // 添加到 configuration 中
         configuration.addMapper(boundType);

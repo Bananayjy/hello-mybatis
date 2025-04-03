@@ -802,6 +802,9 @@ public class Configuration {
 
   public void addResultMap(ResultMap rm) {
     // 添加到 resultMaps 中
+    // 注意：这里的resultMaps是StrictMap对象，put方法被重写，会同时加入两个对象，一个长名，一个短名，如下所示：
+    // org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectImmutableAuthor -> {ResultMap@3445}
+    // selectImmutableAuthor -> {ResultMap@3445}
     resultMaps.put(rm.getId(), rm);
     // 遍历全局的 ResultMap 集合，若其拥有 Discriminator 对象，则判断是否强制标记为有内嵌的 ResultMap
     checkLocallyForDiscriminatedNestedResultMaps(rm);
@@ -1013,7 +1016,7 @@ public class Configuration {
     }
   }
 
-  // 获得 XMLStatementBuilder 集合，并遍历进行处理
+  // 获得 pending的 XMLStatementBuilder 集合，并遍历进行处理
   public void parsePendingStatements(boolean reportUnresolved) {
     if (incompleteStatements.isEmpty()) {
       return;
@@ -1033,7 +1036,7 @@ public class Configuration {
     }
   }
 
-  // 获得 CacheRefResolver 集合，并遍历进行处理
+  // 获得 pending 的 CacheRefResolver 集合，并遍历进行处理
   public void parsePendingCacheRefs(boolean reportUnresolved) {
     if (incompleteCacheRefs.isEmpty()) {
       return;
@@ -1050,17 +1053,21 @@ public class Configuration {
     }
   }
 
+  // 处理 pending 的 resultMap
   public void parsePendingResultMaps(boolean reportUnresolved) {
-    if (incompleteResultMaps.isEmpty()) {
+    if (incompleteResultMaps.isEmpty()) { // 未处理的 ResultMap 集合为空，直接返回
       return;
     }
     incompleteResultMapsLock.lock();
     try {
+      // 标记当前是否解决
       boolean resolved;
+      // 标记是否有异常
       IncompleteElementException ex = null;
       do {
+        // 标记当前未解决
         resolved = false;
-        // 获得 ResultMapResolver 集合，并遍历进行处理
+        // 获得 ResultMapResolver 集合的迭代器，通过迭代器Iterator对象进行遍历进行处理
         Iterator<ResultMapResolver> iterator = incompleteResultMaps.iterator();
         while (iterator.hasNext()) {
           try {
@@ -1075,9 +1082,10 @@ public class Configuration {
           }
         }
       } while (resolved);
-      // 是否抛出异常
+      // 可以入参reportUnresolved决定是否抛出异常
       if (reportUnresolved && !incompleteResultMaps.isEmpty() && ex != null) {
         // At least one result map is unresolvable.
+        // 至少有一个结果map是没有解决的
         throw ex;
       }
     } finally {
