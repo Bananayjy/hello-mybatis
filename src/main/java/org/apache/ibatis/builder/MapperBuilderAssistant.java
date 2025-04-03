@@ -238,31 +238,39 @@ public class MapperBuilderAssistant extends BaseBuilder {
     return new Discriminator.Builder(configuration, resultMapping, namespaceDiscriminatorMap).build();
   }
 
+  // 构建 MappedStatement 对象
   public MappedStatement addMappedStatement(String id, SqlSource sqlSource, StatementType statementType,
       SqlCommandType sqlCommandType, Integer fetchSize, Integer timeout, String parameterMap, Class<?> parameterType,
       String resultMap, Class<?> resultType, ResultSetType resultSetType, boolean flushCache, boolean useCache,
       boolean resultOrdered, KeyGenerator keyGenerator, String keyProperty, String keyColumn, String databaseId,
       LanguageDriver lang, String resultSets, boolean dirtySelect) {
 
+    // CacheRef没有解析，抛出异常
     if (unresolvedCacheRef) {
       throw new IncompleteElementException("Cache-ref not yet resolved");
     }
 
+    // 获得 id 编号，格式为 `${namespace}.${id}` eg：org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAllAuthors
     id = applyCurrentNamespace(id, false);
 
+    // 创建 MappedStatement.Builder 对象
     MappedStatement.Builder statementBuilder = new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType)
         .resource(resource).fetchSize(fetchSize).timeout(timeout).statementType(statementType)
         .keyGenerator(keyGenerator).keyProperty(keyProperty).keyColumn(keyColumn).databaseId(databaseId).lang(lang)
         .resultOrdered(resultOrdered).resultSets(resultSets)
+        //获得 ResultMap 集合
         .resultMaps(getStatementResultMaps(resultMap, resultType, id)).resultSetType(resultSetType)
         .flushCacheRequired(flushCache).useCache(useCache).cache(currentCache).dirtySelect(dirtySelect);
 
+    // 获得 ParameterMap ，并设置到 MappedStatement.Builder 中
     ParameterMap statementParameterMap = getStatementParameterMap(parameterMap, parameterType, id);
     if (statementParameterMap != null) {
       statementBuilder.parameterMap(statementParameterMap);
     }
 
+    // 创建 MappedStatement 对象
     MappedStatement statement = statementBuilder.build();
+    // 添加到 configuration 中
     configuration.addMappedStatement(statement);
     return statement;
   }

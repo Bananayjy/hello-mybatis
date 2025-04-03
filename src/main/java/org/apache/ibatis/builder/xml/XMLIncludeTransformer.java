@@ -31,27 +31,36 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * XML <include /> 标签的转换器，负责将 SQL 中的 <include /> 标签转换成对应的 <sql /> 的内容
  * @author Frank D. Martinez [mnesarco]
  */
 public class XMLIncludeTransformer {
 
+  // mybatis 配置对象
   private final Configuration configuration;
+  // Mapper 构造器助手
   private final MapperBuilderAssistant builderAssistant;
 
+  // 构造方法
   public XMLIncludeTransformer(Configuration configuration, MapperBuilderAssistant builderAssistant) {
     this.configuration = configuration;
     this.builderAssistant = builderAssistant;
   }
 
+  // 将 <include /> 标签，替换成引用的 <sql />
   public void applyIncludes(Node source) {
+    // 创建 variablesContext ，并将 configurationVariables 添加到其中
+    // 这里的目的是，避免 configurationVariables 被下面使用时候，可能被修改
     Properties variablesContext = new Properties();
     Properties configurationVariables = configuration.getVariables();
     Optional.ofNullable(configurationVariables).ifPresent(variablesContext::putAll);
+    // 处理 <include />
     applyIncludes(source, variablesContext, false);
   }
 
   /**
    * Recursively apply includes through all SQL fragments.
+   * 使用递归的方式，将 <include /> 标签，替换成引用的 <sql />
    *
    * @param source
    *          Include node in DOM tree
@@ -91,6 +100,7 @@ public class XMLIncludeTransformer {
     }
   }
 
+  // 获得对应的 <sql /> 节点
   private Node findSqlFragment(String refid, Properties variables) {
     refid = PropertyParser.parse(refid, variables);
     refid = builderAssistant.applyCurrentNamespace(refid, true);
@@ -108,6 +118,19 @@ public class XMLIncludeTransformer {
 
   /**
    * Read placeholders and their values from include node definition.
+   * 获得包含 <include /> 标签内的属性 Properties 对象
+   *
+   * 示例：
+   * <sql id="userColumns"> ${alias}.id,${alias}.username,${alias}.password </sql>
+   *
+   * <select id="selectUsers" resultType="map">
+   *   select
+   *     <include refid="userColumns"><property name="alias" value="t1"/></include>,
+   *     <include refid="userColumns"><property name="alias" value="t2"/></include>
+   *   from some_table t1
+   *     cross join some_table t2
+   * </select>
+   *
    *
    * @param node
    *          Include node instance

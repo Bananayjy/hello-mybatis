@@ -116,7 +116,8 @@ public class XMLMapperBuilder extends BaseBuilder {
       configurationElement(parser.evalNode("/mapper"));
       // 标记该 Mapper 已经加载过，即加入到配置对象configuration的属性loadedResources中
       configuration.addLoadedResource(resource);
-      // 绑定 Mapper 接口（即将Mapper配置文件对应的接口也加入到配置对象维护的mapperRegistry对象中）
+      // 绑定 Mapper 接口（即将Mapper配置文件对应的mapper接口也入到配置对象维护的mapperRegistry对象中）
+      // 并根据注解，解析结果映射信息，保存到配置对象的resultMaps对象中等等
       bindMapperForNamespace();
     }
 
