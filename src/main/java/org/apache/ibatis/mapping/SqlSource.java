@@ -16,13 +16,21 @@
 package org.apache.ibatis.mapping;
 
 /**
+ * SQL 来源接口。它代表从 Mapper XML 或方法注解上，读取的一条 SQL 内容
  * Represents the content of a mapped statement read from an XML file or an annotation. It creates the SQL that will be
  * passed to the database out of the input parameter received from the user.
+ * 表示从XML文件或注释中读取的映射语句的内容。它创建将从用户接收到的输入参数传递到数据库的SQL。
  *
  * @author Clinton Begin
  */
 public interface SqlSource {
 
+  /**
+   * 根据传入的参数对象，返回 BoundSql 对象
+   *
+   * @param parameterObject 参数对象
+   * @return BoundSql 对象
+   */
   BoundSql getBoundSql(Object parameterObject);
 
 }

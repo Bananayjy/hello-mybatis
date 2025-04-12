@@ -24,20 +24,29 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 一次可执行的 SQL 封装
  * An actual SQL String got from an {@link SqlSource} after having processed any dynamic content. The SQL may have SQL
  * placeholders "?" and a list (ordered) of a parameter mappings with the additional information for each parameter (at
  * least the property name of the input object to read the value from).
+ * 在处理任何动态内容之后，从{@link SqlSource}获得的实际SQL字符串。SQL可能有SQL占位符“？”和一个参数映射列表（有序），
+ * 其中包含每个参数的附加信息（至少是要从中读取值的输入对象的属性名）。
  * <p>
  * Can also have additional parameters that are created by the dynamic language (for loops, bind...).
+ * 还可以有由动态语言创建的附加参数（for循环，bind…）
  *
  * @author Clinton Begin
  */
 public class BoundSql {
 
+  // SQL 语句
   private final String sql;
+  //  ParameterMapping 数组
   private final List<ParameterMapping> parameterMappings;
+  // 参数对象
   private final Object parameterObject;
+  // 附加的参数集合
   private final Map<String, Object> additionalParameters;
+  // {@link #additionalParameters} 的 MetaObject 对象
   private final MetaObject metaParameters;
 
   public BoundSql(Configuration configuration, String sql, List<ParameterMapping> parameterMappings,

@@ -20,10 +20,13 @@ package org.apache.ibatis.mapping;
  */
 public enum ParameterMode {
 
+  // 输入
   IN,
 
+  // 输出
   OUT,
 
+  // IN + OUT
   INOUT
 
 }

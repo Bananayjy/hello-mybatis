@@ -23,12 +23,17 @@ import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 静态的 SqlSource 实现类，实现 SqlSource 接口
+ * 注意：相对于 DynamicSqlSource 和 RawSqlSource 来说，StaticSqlSource.sql 属性，上面还是可能包括 ? 占位符
  * @author Clinton Begin
  */
 public class StaticSqlSource implements SqlSource {
 
+  // 静态的 SQL
   private final String sql;
+  // ParameterMapping 集合
   private final List<ParameterMapping> parameterMappings;
+  // mybatis 配置对象
   private final Configuration configuration;
 
   public StaticSqlSource(Configuration configuration, String sql) {
@@ -43,6 +48,7 @@ public class StaticSqlSource implements SqlSource {
 
   @Override
   public BoundSql getBoundSql(Object parameterObject) {
+    // 创建 BoundSql 对象，通过 parameterMappings 和 parameterObject 属性，可以设置 sql 上的每个占位符的值
     return new BoundSql(configuration, sql, parameterMappings, parameterObject);
   }
 
