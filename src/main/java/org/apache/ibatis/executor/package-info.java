@@ -15,5 +15,12 @@
  */
 /**
  * Contains the statement executors.
+ * statement包：实现向数据库发起SQL命令
+ * parameter包：实现设置PreparedStatement的占位符参数
+ * keygen 包，实现数据库主键生成( 获得 )的功能
+ * resultset 包，实现 ResultSet 结果集的处理，将其映射成对应的结果对象。
+ * result 包，结果的处理，被 resultset 包所调用
+ * loader 包，实现延迟加载的功能
+ * 根目录，Executor 接口及其实现类，作为 SQL 执行的核心入口
  */
 package org.apache.ibatis.executor;

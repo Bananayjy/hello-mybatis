@@ -744,12 +744,24 @@ public class Configuration {
     return (StatementHandler) interceptorChain.pluginAll(statementHandler);
   }
 
+
+  /**
+   * 创建Executor对象（默认为简单的执行器对象）
+   * 执行器类型。可以通过在 mybatis-config.xml 配置文件：
+   * value 有三种类型：SIMPLE REUSE BATCH
+   * <setting name="defaultExecutorType" value="" />
+   *
+   * @param transaction
+   * @return
+   */
   public Executor newExecutor(Transaction transaction) {
     return newExecutor(transaction, defaultExecutorType);
   }
 
   public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
+    // 获得执行器类型，默认为 SIMPLE
     executorType = executorType == null ? defaultExecutorType : executorType;
+    // 创建对应实现的 Executor 对象
     Executor executor;
     if (ExecutorType.BATCH == executorType) {
       executor = new BatchExecutor(this, transaction);
@@ -758,9 +770,11 @@ public class Configuration {
     } else {
       executor = new SimpleExecutor(this, transaction);
     }
+    // 如果开启缓存，创建 CachingExecutor 对象，对原始执行器进行包装
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+    // 应用插件，扩展
     return (Executor) interceptorChain.pluginAll(executor);
   }
 
