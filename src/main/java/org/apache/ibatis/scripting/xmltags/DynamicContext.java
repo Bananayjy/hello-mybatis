@@ -27,22 +27,31 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 动态 SQL ，用于每次执行 SQL 操作时，记录动态 SQL 处理后的最终 SQL 字符串
  * @author Clinton Begin
  */
 public class DynamicContext {
 
+  // _parameter 的键，参数
   public static final String PARAMETER_OBJECT_KEY = "_parameter";
+  // _databaseId 的键，数据库编号
   public static final String DATABASE_ID_KEY = "_databaseId";
 
   static {
+    // 设置 OGNL 的属性访问器
     OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());
   }
 
+  // 上下文的参数集合（需要动态绑定的属性）
   private final ContextMap bindings;
+  // 生成后的 SQL
   private final StringJoiner sqlBuilder = new StringJoiner(" ");
+  // 唯一编号。在 {@link org.apache.ibatis.scripting.xmltags.XMLScriptBuilder.ForEachHandler} 使用
   private int uniqueNumber;
 
+  // 当需要使用到 OGNL 表达式时，parameterObject 非空
   public DynamicContext(Configuration configuration, Object parameterObject) {
+    // 初始化 bindings 参数
     if (parameterObject != null && !(parameterObject instanceof Map)) {
       MetaObject metaObject = configuration.newMetaObject(parameterObject);
       boolean existsTypeHandler = configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
@@ -50,32 +59,42 @@ public class DynamicContext {
     } else {
       bindings = new ContextMap(null, false);
     }
+    //  添加 bindings 的默认值
     bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
     bindings.put(DATABASE_ID_KEY, configuration.getDatabaseId());
   }
 
+  // 获取对应的 KV 键值对
   public Map<String, Object> getBindings() {
     return bindings;
   }
 
+  // 可以往 bindings 属性中，添加新的 KV 键值对
   public void bind(String name, Object value) {
     bindings.put(name, value);
   }
 
+  // 不断向 sqlBuilder 属性中，添加 SQL 段
   public void appendSql(String sql) {
     sqlBuilder.add(sql);
   }
 
+  // 获取 SQL 段
   public String getSql() {
     return sqlBuilder.toString().trim();
   }
 
+  // 每次请求，获得新的序号
   public int getUniqueNumber() {
     return uniqueNumber++;
   }
 
+
+  // DynamicContext 的内部静态类，继承 HashMap 类，上下文的参数集合
+  // 该类在 HashMap 的基础上，增加支持对 parameterMetaObject 属性的访问
   static class ContextMap extends HashMap<String, Object> {
     private static final long serialVersionUID = 2977601501966151582L;
+    // parameter 对应的 MetaObject 对象
     private final MetaObject parameterMetaObject;
     private final boolean fallbackParameterObject;
 
@@ -86,6 +105,7 @@ public class DynamicContext {
 
     @Override
     public Object get(Object key) {
+      // 如果有 key 对应的值，直接获得
       String strKey = (String) key;
       if (super.containsKey(strKey)) {
         return super.get(strKey);
@@ -98,11 +118,13 @@ public class DynamicContext {
       if (fallbackParameterObject && !parameterMetaObject.hasGetter(strKey)) {
         return parameterMetaObject.getOriginalObject();
       }
+      // 从 parameterMetaObject 中，获得 key 对应的属性
       // issue #61 do not modify the context when reading
       return parameterMetaObject.getValue(strKey);
     }
   }
 
+  // 是 DynamicContext 的内部静态类，实现 ognl.PropertyAccessor 接口，上下文访问器
   static class ContextAccessor implements PropertyAccessor {
 
     @Override
@@ -110,10 +132,12 @@ public class DynamicContext {
       Map map = (Map) target;
 
       Object result = map.get(name);
+      // 优先从 ContextMap 中，获得属性
       if (map.containsKey(name) || result != null) {
         return result;
       }
 
+      // 如果没有，则从 PARAMETER_OBJECT_KEY 对应的 Map 中，获得属性
       Object parameterObject = map.get(PARAMETER_OBJECT_KEY);
       if (parameterObject instanceof Map) {
         return ((Map) parameterObject).get(name);

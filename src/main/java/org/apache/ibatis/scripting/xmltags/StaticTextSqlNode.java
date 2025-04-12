@@ -16,6 +16,7 @@
 package org.apache.ibatis.scripting.xmltags;
 
 /**
+ * 实现 SqlNode 接口，静态文本的 SqlNode 实现类
  * @author Clinton Begin
  */
 public class StaticTextSqlNode implements SqlNode {
@@ -27,6 +28,7 @@ public class StaticTextSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 直接拼接到 context 中
     context.appendSql(text);
     return true;
   }

@@ -223,7 +223,9 @@ public class Configuration {
     typeAliasRegistry.registerAlias("CGLIB", CglibProxyFactory.class);
     typeAliasRegistry.registerAlias("JAVASSIST", JavassistProxyFactory.class);
 
+    // 注册默认的 LanguageDriver 类对象
     languageRegistry.setDefaultDriverClass(XMLLanguageDriver.class);
+    // 注册 RawSqlSource 语言驱动器实现类
     languageRegistry.register(RawLanguageDriver.class);
   }
 
@@ -685,6 +687,8 @@ public class Configuration {
 
   /**
    * Gets the language driver.
+   * 获取语言驱动实现类
+   * 默认情况下，使用 XMLLanguageDriver 类（由Configuration的构造器中可以看到默认的语言驱动类是XMLLanguageDriver）
    *
    * @param langClass
    *          the lang class
@@ -694,11 +698,11 @@ public class Configuration {
    * @since 3.5.1
    */
   public LanguageDriver getLanguageDriver(Class<? extends LanguageDriver> langClass) {
-    // 如果为空，则使用默认的langClass 类
+    // 如果为空，则使用默认的langClass 类（由Configuration的构造器中可以看到默认的语言驱动类是XMLLanguageDriver）
     if (langClass == null) {
       return languageRegistry.getDefaultDriver();
     }
-    // 获得 LanguageDriver 对象
+    // 获得 LanguageDriver 对象（先注册到LanguageDriver映射对象中，后获取返回）
     languageRegistry.register(langClass);
     return languageRegistry.getDriver(langClass);
   }

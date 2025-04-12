@@ -23,53 +23,61 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
 
+// 语言驱动接口
 public interface LanguageDriver {
 
   /**
+   *
+   * 创建 ParameterHandler 对象
    * Creates a {@link ParameterHandler} that passes the actual parameters to the the JDBC statement.
+   * 创建一个{@link ParameterHandler}，将实际参数传递给JDBC语句
    *
    * @author Frank D. Martinez [mnesarco]
    *
    * @param mappedStatement
-   *          The mapped statement that is being executed
+   *          The mapped statement that is being executed 正在执行的映射语句
    * @param parameterObject
-   *          The input parameter object (can be null)
+   *          The input parameter object (can be null) 输入参数对象（可以为null）
    * @param boundSql
-   *          The resulting SQL once the dynamic language has been executed.
+   *          The resulting SQL once the dynamic language has been executed. 执行动态语言后的结果SQL
    *
-   * @return the parameter handler
+   * @return the parameter handler ParameterHandler对象
    *
    * @see DefaultParameterHandler
    */
   ParameterHandler createParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql);
 
   /**
+   * 创建 SqlSource 对象，从 Mapper XML 配置的 Statement 标签中，即 <select /> 等
    * Creates an {@link SqlSource} that will hold the statement read from a mapper xml file. It is called during startup,
    * when the mapped statement is read from a class or an xml file.
+   * 创建{@link SqlSource}来保存从mapper xml文件中读取的语句。当从类或xml文件中读取映射语句时，在启动期间调用它。
    *
    * @param configuration
-   *          The MyBatis configuration
+   *          The MyBatis configuration Myabtis的配置文件
    * @param script
-   *          XNode parsed from a XML file
+   *          XNode parsed from a XML file  从XML文件解析的XNode
    * @param parameterType
    *          input parameter type got from a mapper method or specified in the parameterType xml attribute. Can be
-   *          null.
+   *          null. 从映射器方法获得或在parameterType xml属性中指定的输入参数类型。可以为空
    *
    * @return the sql source
    */
   SqlSource createSqlSource(Configuration configuration, XNode script, Class<?> parameterType);
 
   /**
+   * 创建 SqlSource 对象，从方法注解配置，即 @Select 等。
    * Creates an {@link SqlSource} that will hold the statement read from an annotation. It is called during startup,
    * when the mapped statement is read from a class or an xml file.
+   * 创建{@link SqlSource}来保存从注释中读取的语句。当从类或xml文件中读取映射语句时，在启动期间调用它
    *
    * @param configuration
-   *          The MyBatis configuration
+   *          The MyBatis configuration Myabtis的配置文件
    * @param script
-   *          The content of the annotation
+   *          The content of the annotation 注释的内容
    * @param parameterType
    *          input parameter type got from a mapper method or specified in the parameterType xml attribute. Can be
-   *          null.
+   *          null. 从映射器方法获得或在parameterType xml属性中指定的输入参数类型。可以为空
    *
    * @return the sql source
    */
