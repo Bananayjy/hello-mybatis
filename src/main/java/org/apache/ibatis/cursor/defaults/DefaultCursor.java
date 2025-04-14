@@ -29,6 +29,7 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * 实现 Cursor 接口，默认 Cursor 实现类
  * This is the default implementation of a MyBatis Cursor. This implementation is not thread safe.
  *
  * @author Guillaume Darmont / guillaume@dropinocean.com
@@ -40,12 +41,17 @@ public class DefaultCursor<T> implements Cursor<T> {
   private final ResultMap resultMap;
   private final ResultSetWrapper rsw;
   private final RowBounds rowBounds;
+  // ObjectWrapperResultHandler 对象
   protected final ObjectWrapperResultHandler<T> objectWrapperResultHandler = new ObjectWrapperResultHandler<>();
 
+  // CursorIterator 对象，游标迭代器。
   private final CursorIterator cursorIterator = new CursorIterator();
+  // 是否开始迭代
   private boolean iteratorRetrieved;
 
+  // 游标状态
   private CursorStatus status = CursorStatus.CREATED;
+  // 已完成映射的行数
   private int indexWithRowBound = -1;
 
   private enum CursorStatus {
@@ -59,11 +65,11 @@ public class DefaultCursor<T> implements Cursor<T> {
      */
     OPEN,
     /**
-     * A closed cursor, not fully consumed.
+     * A closed cursor, not fully consumed. 已关闭，并未完全消费
      */
     CLOSED,
     /**
-     * A fully consumed cursor, a consumed cursor is always closed.
+     * A fully consumed cursor, a consumed cursor is always closed. 已关闭，并且完全消费
      */
     CONSUMED
   }
@@ -91,14 +97,17 @@ public class DefaultCursor<T> implements Cursor<T> {
     return rowBounds.getOffset() + cursorIterator.iteratorIndex;
   }
 
+  // 获取迭代器
   @Override
   public Iterator<T> iterator() {
+    // 如果已经获取，则抛出 IllegalStateException 异常
     if (iteratorRetrieved) {
       throw new IllegalStateException("Cannot open more than one iterator on a Cursor");
     }
     if (isClosed()) {
       throw new IllegalStateException("A Cursor is already closed.");
     }
+    // 标记已经获取
     iteratorRetrieved = true;
     return cursorIterator;
   }
@@ -122,39 +131,48 @@ public class DefaultCursor<T> implements Cursor<T> {
   }
 
   protected T fetchNextUsingRowBound() {
+    // 遍历下一条记录
     T result = fetchNextObjectFromDatabase();
+    // 循环跳过 rowBounds 的索引
     while (objectWrapperResultHandler.fetched && indexWithRowBound < rowBounds.getOffset()) {
       result = fetchNextObjectFromDatabase();
     }
+    // 返回记录
     return result;
   }
 
   protected T fetchNextObjectFromDatabase() {
+    // 如果已经关闭，返回 null
     if (isClosed()) {
       return null;
     }
 
     try {
       objectWrapperResultHandler.fetched = false;
+      // 设置状态为 CursorStatus.OPEN
       status = CursorStatus.OPEN;
+      // 遍历下一条记录
       if (!rsw.getResultSet().isClosed()) {
         resultSetHandler.handleRowValues(rsw, resultMap, objectWrapperResultHandler, RowBounds.DEFAULT, null);
       }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-
+    //  复制给 next
     T next = objectWrapperResultHandler.result;
+    // 增加 indexWithRowBound
     if (objectWrapperResultHandler.fetched) {
       indexWithRowBound++;
     }
-    // No more object or limit reached
+    // No more object or limit reached 没有更多记录，或者到达 rowBounds 的限制索引位置，则关闭游标，并设置状态为 CursorStatus.CONSUMED
     if (!objectWrapperResultHandler.fetched || getReadItemsCount() == rowBounds.getOffset() + rowBounds.getLimit()) {
       close();
       status = CursorStatus.CONSUMED;
     }
+    // 置空 objectWrapperResultHandler.result 属性
     objectWrapperResultHandler.result = null;
 
+    //
     return next;
   }
 
@@ -166,28 +184,33 @@ public class DefaultCursor<T> implements Cursor<T> {
     return indexWithRowBound + 1;
   }
 
+  // ObjectWrapperResultHandler ，DefaultCursor 的内部静态类，实现 ResultHandler 接口
   protected static class ObjectWrapperResultHandler<T> implements ResultHandler<T> {
 
+    // 结果对象
     protected T result;
     protected boolean fetched;
 
     @Override
     public void handleResult(ResultContext<? extends T> context) {
+      // 设置结果对象
       this.result = context.getResultObject();
+      // 暂停
       context.stop();
       fetched = true;
     }
   }
 
+  // CursorIterator ，DefaultCursor 的内部类，实现 Iterator 接口，游标的迭代器实现类
   protected class CursorIterator implements Iterator<T> {
 
     /**
-     * Holder for the next object to be returned.
+     * Holder for the next object to be returned. 结果对象，提供给 {@link #next()} 返回
      */
     T object;
 
     /**
-     * Index of objects returned using next(), and as such, visible to users.
+     * Index of objects returned using next(), and as such, visible to users. 索引位置
      */
     int iteratorIndex = -1;
 
