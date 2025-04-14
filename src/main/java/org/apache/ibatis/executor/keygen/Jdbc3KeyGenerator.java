@@ -44,6 +44,8 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.ibatis.util.MapUtil;
 
 /**
+ * KeyGenerator 接口的实现
+ * 基于 Statement#getGeneratedKeys() 方法的 KeyGenerator 实现类，适用于 MySQL、H2 主键生成
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -53,6 +55,7 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
 
   /**
    * A shared instance.
+   * 共享的单例
    *
    * @since 3.4.3
    */
@@ -61,27 +64,33 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
   private static final String MSG_TOO_MANY_KEYS = "Too many keys are generated. There are only %d target objects. "
       + "You either specified a wrong 'keyProperty' or encountered a driver bug like #1523.";
 
+  // 空实现，因为对于 Jdbc3KeyGenerator 类的主键，是在 SQL 执行后，才生成
   @Override
   public void processBefore(Executor executor, MappedStatement ms, Statement stmt, Object parameter) {
     // do nothing
   }
 
+  // jdk执行后调用该方法
   @Override
   public void processAfter(Executor executor, MappedStatement ms, Statement stmt, Object parameter) {
+    // 处理返回的自增主键。单个 parameter 参数，可以认为是批量的一个特例（即只有一个需要处理的批量）
     processBatch(ms, stmt, parameter);
   }
 
   public void processBatch(MappedStatement ms, Statement stmt, Object parameter) {
+    // 获得主键属性的配置。如果为空，则直接返回，说明不需要主键
     final String[] keyProperties = ms.getKeyProperties();
     if (keyProperties == null || keyProperties.length == 0) {
       return;
     }
+    // 通过调用Statement#getGeneratedKeys()获得返回的自增主键
     try (ResultSet rs = stmt.getGeneratedKeys()) {
       final ResultSetMetaData rsmd = rs.getMetaData();
       final Configuration configuration = ms.getConfiguration();
-      if (rsmd.getColumnCount() < keyProperties.length) {
+      if (rsmd.getColumnCount() < keyProperties.length) { // 如果返回的自增主键数量小于 keyProperties 的数量，则说明有问题
         // Error?
       } else {
+        // 分配主键
         assignKeys(configuration, rs, rsmd, keyProperties, parameter);
       }
     } catch (Exception e) {
@@ -92,7 +101,7 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
   @SuppressWarnings("unchecked")
   private void assignKeys(Configuration configuration, ResultSet rs, ResultSetMetaData rsmd, String[] keyProperties,
       Object parameter) throws SQLException {
-    if (parameter instanceof ParamMap || parameter instanceof StrictMap) {
+    if (parameter instanceof ParamMap || parameter instanceof StrictMap) {  // Map对象的处理
       // Multi-param or single param with @Param
       assignKeysToParamMap(configuration, rs, rsmd, keyProperties, (Map<String, ?>) parameter);
     } else if (parameter instanceof ArrayList && !((ArrayList<?>) parameter).isEmpty()
@@ -248,6 +257,7 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
       this.propertyName = propertyName;
     }
 
+    // 设置自增的值
     protected void assign(ResultSet rs, Object param) {
       if (paramName != null) {
         // If paramName is set, param is ParamMap

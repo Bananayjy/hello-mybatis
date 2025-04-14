@@ -21,12 +21,26 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 
 /**
+ * 主键生成器接口
+ * 即在SQL执行前后可以进行处理主键的生成
+ * 实际上，KeyGenerator 类的命名虽然包含 Generator ，但是目前 MyBatis 默认的 KeyGenerator 实现类，都是基于数据库来实现主键自增的功能
  * @author Clinton Begin
  */
 public interface KeyGenerator {
 
+  // SQL 执行前
+
+  /**
+   * 关于parameter参数示例：
+   * @Options(useGeneratedKeys = true, keyProperty = "id")
+   * @Insert({"insert into country (countryname,countrycode) values (#{countryname},#{countrycode})"})
+   * int insertBean(Country country);
+   * 上面insetBean方法的country 方法参数，就是一个 parameter 参数，KeyGenerator 在获取到主键后，会设置回 parameter 参数的对应属性
+   *
+   */
   void processBefore(Executor executor, MappedStatement ms, Statement stmt, Object parameter);
 
+  // SQL执行后
   void processAfter(Executor executor, MappedStatement ms, Statement stmt, Object parameter);
 
 }

@@ -27,6 +27,8 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * KeyGenerator 接口实现类
+ * 基于从数据库查询主键的 KeyGenerator 实现类，适用于 Oracle、PostgreSQL
  * @author Clinton Begin
  * @author Jeff Butler
  */
