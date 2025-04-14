@@ -30,15 +30,20 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * 路由的 StatementHandler 对象
+ * 负责根据不同的 Statement 类型，分别路由对应 java.sql.Statement、java.sql.PreparedStatement、java.sql.CallableStatement 三种不同的实现类
  * @author Clinton Begin
  */
 public class RoutingStatementHandler implements StatementHandler {
 
+  // 被委托的 StatementHandler 对象
   private final StatementHandler delegate;
 
   public RoutingStatementHandler(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds,
       ResultHandler resultHandler, BoundSql boundSql) {
 
+    // 通过MappedStatement获取创建StatementHandler的类型
+    // 根据不同的类型，创建对应的 StatementHandler 实现类
     switch (ms.getStatementType()) {
       case STATEMENT:
         delegate = new SimpleStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
@@ -55,6 +60,7 @@ public class RoutingStatementHandler implements StatementHandler {
 
   }
 
+  // 所有的实现方法，调用 delegate 对应的方法即可
   @Override
   public Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException {
     return delegate.prepare(connection, transactionTimeout);

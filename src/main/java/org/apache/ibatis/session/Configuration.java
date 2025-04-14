@@ -725,8 +725,10 @@ public class Configuration {
 
   public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject,
       BoundSql boundSql) {
+    // 创建 ParameterHandler 对象（创建默认的ParameterHandler对象：DefaultParameterHandler 对象）
     ParameterHandler parameterHandler = mappedStatement.getLang().createParameterHandler(mappedStatement,
         parameterObject, boundSql);
+    // 应用插件
     return (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
   }
 
@@ -739,8 +741,11 @@ public class Configuration {
 
   public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement,
       Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+    // 创建 StatementHandler的路由对象：RoutingStatementHandler 对象
+    // 通过它，自动路由到适合的 StatementHandler 实现类
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject,
         rowBounds, resultHandler, boundSql);
+    // 应用插件
     return (StatementHandler) interceptorChain.pluginAll(statementHandler);
   }
 
