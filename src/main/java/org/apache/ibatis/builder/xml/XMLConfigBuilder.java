@@ -139,15 +139,15 @@ public class XMLConfigBuilder extends BaseBuilder {
       // issue #117 read properties first
       // 解析 <properties /> 标签
       propertiesElement(root.evalNode("properties"));
-      // 解析 <settings /> 标签
+      // 解析 <settings /> 标签，将内容封装为Properties 对象，并赋值给变量settings
       Properties settings = settingsAsProperties(root.evalNode("settings"));
-      // 加载自定义 VFS 实现类
+      // 通过settings标签配置内容，加载自定义 VFS 实现类(用于访问应用服务器中的资源)
       loadCustomVfsImpl(settings);
-      // 加载自定义Log实现类
+      // 通过settings标签配置内容，加载自定义Log实现类
       loadCustomLogImpl(settings);
-      // 解析 <typeAliases /> 标签
+      // 解析 <typeAliases /> 标签，将别名和对应的类对象注册到 typeAliasRegistry 中
       typeAliasesElement(root.evalNode("typeAliases"));
-      // 解析 <plugins /> 标签
+      // 解析 <plugins /> 标签，插件相关
       pluginsElement(root.evalNode("plugins"));
       // 解析 <objectFactory /> 标签
       objectFactoryElement(root.evalNode("objectFactory"));
@@ -155,14 +155,14 @@ public class XMLConfigBuilder extends BaseBuilder {
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
       // 解析 <reflectorFactory /> 标签
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
-      // 赋值 <settings /> 到 Configuration 属性
+      // 根据<settings /> 完成 Configuration 各个参数的设置
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
       // 解析 <environments /> 标签
       environmentsElement(root.evalNode("environments"));
       // 解析 <databaseIdProvider /> 标签
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
-      // 解析 <typeHandlers /> 标签
+      // 解析 <typeHandlers /> 标签，类型处理器（java Type 和 jdbc Type 的映射）
       typeHandlersElement(root.evalNode("typeHandlers"));
       // 解析 <mappers /> 标签
       mappersElement(root.evalNode("mappers"));
@@ -221,6 +221,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   // 解析 <typeAliases /> 标签，将配置类注册到 typeAliasRegistry 中
+  // 这里typeAliasRegistry就是configuration中typeAliasRegistry的引用
   private void typeAliasesElement(XNode context) {
     // 如果 <typeAliases /> 标签为 null，直接返回
     if (context == null) {
@@ -384,6 +385,8 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setNullableOnForEach(booleanValueOf(props.getProperty("nullableOnForEach"), false));
   }
 
+  // 解析 <environments /> 标签
+  // 创建环境environment对象（其中包括事务工厂TransactionFactory、数据源工厂DataSourceFactory、数据源DataSource）
   private void environmentsElement(XNode context) throws Exception {
     if (context == null) {  // environments节点为空，则直接返回
       return;
@@ -474,6 +477,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   // 解析 <typeHandlers /> 标签
+  // 同理，这里typeHandlerRegistry也是Configuration的引用
   private void typeHandlersElement(XNode context) {
     if (context == null) { // <typeHandlers /> 标签为 null，直接返回
       return;
@@ -526,7 +530,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             // 创建 XMLMapperBuilder 对象
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource,
                 configuration.getSqlFragments());
-            // 执行解析
+            // 执行解析 Mapper 映射配置文件
             mapperParser.parse();
           }
         } else if (resource == null && url != null && mapperClass == null) {  // 使用完全限定资源定位符（URL）

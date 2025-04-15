@@ -24,6 +24,7 @@ import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
 
 // 语言驱动接口
+//是 MyBatis 中负责处理 SQL 脚本的核心接口，它定义了如何解析和执行动态 SQL 的规范
 public interface LanguageDriver {
 
   /**

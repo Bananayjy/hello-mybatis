@@ -150,13 +150,16 @@ public class XMLMapperBuilder extends BaseBuilder {
       }
       // 设置 namespace 属性，设置到builderAssistant对象中
       builderAssistant.setCurrentNamespace(namespace);
-      // 解析 <cache-ref /> 节点
+      // 解析 <cache-ref /> 节点，添加到 configuration 的 cacheRefMap 中
       cacheRefElement(context.evalNode("cache-ref"));
-      // 解析 <cache /> 节点
+      // 解析 <cache /> 节点，将当前使用的缓存 Cache实现类 添加到 configuration 的 caches 中
       cacheElement(context.evalNode("cache"));
       // todo 已废弃！老式风格的参数映射。内联参数是首选,这个元素可能在将来被移除，这里不会记录
+      // 解析 <parameterMap /> 节点们, 并加入到配置对象Configuration对象的parameterMaps成员变量中
+      // 这里的map实现类会将全限定名和短命都加一下：
+      // 如org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor -> {ParameterMap@5543} 和 selectAuthor -> {ParameterMap@5543}
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
-      // 解析 <resultMap /> 节点们
+      // 解析 <resultMap /> 节点们, 并加入到配置对象Configuration对象的resultMaps成员变量中
       resultMapElements(context.evalNodes("/mapper/resultMap"));
       // 解析 <sql /> 节点们
       sqlElement(context.evalNodes("/mapper/sql"));
