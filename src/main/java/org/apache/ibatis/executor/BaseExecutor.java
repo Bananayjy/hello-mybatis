@@ -220,13 +220,15 @@ public abstract class BaseExecutor implements Executor {
   @Override
   public void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key,
       Class<?> targetType) {
+    // 如果执行器已关闭，抛出 ExecutorException 异常
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // 创建 DeferredLoad 对象
     DeferredLoad deferredLoad = new DeferredLoad(resultObject, property, key, localCache, configuration, targetType);
-    if (deferredLoad.canLoad()) {
+    if (deferredLoad.canLoad()) { // 如果可加载，则执行加载
       deferredLoad.load();
-    } else {
+    } else { // 如果不可加载，则添加到 deferredLoads 中
       deferredLoads.add(new DeferredLoad(resultObject, property, key, localCache, configuration, targetType));
     }
   }
@@ -426,6 +428,7 @@ public abstract class BaseExecutor implements Executor {
     this.wrapper = wrapper;
   }
 
+  // 延时加载静态对象
   private static class DeferredLoad {
 
     private final MetaObject resultObject;
@@ -454,9 +457,11 @@ public abstract class BaseExecutor implements Executor {
 
     public void load() {
       @SuppressWarnings("unchecked")
-      // we suppose we get back a List
+      // we suppose we get back a List 从缓存 localCache 中获取
       List<Object> list = (List<Object>) localCache.getObject(key);
+      // 解析结果
       Object value = resultExtractor.extractObjectFromList(list, targetType);
+      // 设置到 resultObject 中
       resultObject.setValue(property, value);
     }
 

@@ -35,24 +35,37 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
+ * 结果加载器
  * @author Clinton Begin
  */
 public class ResultLoader {
 
+  // 配置文件对象
   protected final Configuration configuration;
+  // 执行器对象
   protected final Executor executor;
+  // XML映射语句对象
   protected final MappedStatement mappedStatement;
+  // 查询的参数对象
   protected final Object parameterObject;
+  // 结果的类型
   protected final Class<?> targetType;
   protected final ObjectFactory objectFactory;
+  // 缓存key
   protected final CacheKey cacheKey;
+  // 一次可执行的 SQL 封装
   protected final BoundSql boundSql;
+  //  ResultExtractor 对象
   protected final ResultExtractor resultExtractor;
+  //  创建 ResultLoader 对象时，所在的线程id
   protected final long creatorThreadId;
 
+  // 是否已经加载
   protected boolean loaded;
+  // 查询的结果对象
   protected Object resultObject;
 
+  // 构造方法
   public ResultLoader(Configuration config, Executor executor, MappedStatement mappedStatement, Object parameterObject,
       Class<?> targetType, CacheKey cacheKey, BoundSql boundSql) {
     this.configuration = config;
@@ -67,41 +80,56 @@ public class ResultLoader {
     this.creatorThreadId = Thread.currentThread().getId();
   }
 
+  // 加载结果
   public Object loadResult() throws SQLException {
+    // 查询结果
     List<Object> list = selectList();
+    // 提取结果
     resultObject = resultExtractor.extractObjectFromList(list, targetType);
+    // 返回结果
     return resultObject;
   }
 
+  // 查询结果
   private <E> List<E> selectList() throws SQLException {
+    // 获得 执行器对象： Executor 对象
     Executor localExecutor = executor;
+    // 如果当前线程不等于创建ResultLoader对象时的线程 或者 当前执行器对象已经关闭，则获取新的执行器（因为 Executor 是非线程安全的）
     if (Thread.currentThread().getId() != this.creatorThreadId || localExecutor.isClosed()) {
       localExecutor = newExecutor();
     }
     try {
+      // 执行查询
       return localExecutor.query(mappedStatement, parameterObject, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER,
           cacheKey, boundSql);
     } finally {
+      //  关闭 Executor 对象
       if (localExecutor != executor) {
         localExecutor.close(false);
       }
     }
   }
 
+  // 创建 Executor 对象
   private Executor newExecutor() {
+    // 校验 environment
     final Environment environment = configuration.getEnvironment();
     if (environment == null) {
       throw new ExecutorException("ResultLoader could not load lazily.  Environment was not configured.");
     }
+    // 校验 ds
     final DataSource ds = environment.getDataSource();
     if (ds == null) {
       throw new ExecutorException("ResultLoader could not load lazily.  DataSource was not configured.");
     }
+    // 创建 Transaction 对象
     final TransactionFactory transactionFactory = environment.getTransactionFactory();
     final Transaction tx = transactionFactory.newTransaction(ds, null, false);
+    // 创建 Executor 对象
     return configuration.newExecutor(tx, ExecutorType.SIMPLE);
   }
 
+  // 判断是否结果为空。
   public boolean wasNull() {
     return resultObject == null;
   }
