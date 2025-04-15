@@ -960,9 +960,12 @@ public class Configuration {
   }
 
   public MappedStatement getMappedStatement(String id, boolean validateIncompleteStatements) {
+    // 校验，保证所有 MappedStatement 已经构造完毕（防御性编程？）
     if (validateIncompleteStatements) {
+      // 用来保证所有 MappedStatement 已经构造完毕，没有构造完毕的进行构造
       buildAllStatements();
     }
+    // 获取 MappedStatement 对象
     return mappedStatements.get(id);
   }
 
@@ -1022,6 +1025,7 @@ public class Configuration {
     parsePendingMethods(true);
   }
 
+  // 保证 incompleteMethods 被解析完
   public void parsePendingMethods(boolean reportUnresolved) {
     if (incompleteMethods.isEmpty()) {
       return;
@@ -1041,7 +1045,7 @@ public class Configuration {
     }
   }
 
-  // 获得 pending的 XMLStatementBuilder 集合，并遍历进行处理
+  // 保证 incompleteStatements 被解析完，获得 pending的 XMLStatementBuilder 集合，并遍历进行处理
   public void parsePendingStatements(boolean reportUnresolved) {
     if (incompleteStatements.isEmpty()) {
       return;
@@ -1061,7 +1065,7 @@ public class Configuration {
     }
   }
 
-  // 获得 pending 的 CacheRefResolver 集合，并遍历进行处理
+  // 保证 incompleteCacheRefs 被解析完，获得 pending 的 CacheRefResolver 集合，并遍历进行处理
   public void parsePendingCacheRefs(boolean reportUnresolved) {
     if (incompleteCacheRefs.isEmpty()) {
       return;
@@ -1078,7 +1082,7 @@ public class Configuration {
     }
   }
 
-  // 处理 pending 的 resultMap
+  // 保证 incompleteResultMaps 被解析完，处理 pending 的 resultMap
   public void parsePendingResultMaps(boolean reportUnresolved) {
     if (incompleteResultMaps.isEmpty()) { // 未处理的 ResultMap 集合为空，直接返回
       return;

@@ -26,8 +26,8 @@ import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 
 /**
- * MyBatis 的初始化流程的入口
- *
+ * SqlSessionFactory 构造器
+ * 作用：MyBatis 的初始化流程的入口，提供了各种 build 的重载方法，核心的套路都是解析出 Configuration 配置对象，从而创建出 DefaultSqlSessionFactory 对象
  * Builds {@link SqlSession} instances.
  *
  * @author Clinton Begin

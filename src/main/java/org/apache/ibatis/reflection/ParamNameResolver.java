@@ -180,7 +180,7 @@ public class ParamNameResolver {
    * @since 3.5.5
    */
   public static Object wrapToMapIfCollection(Object object, String actualParamName) {
-    if (object instanceof Collection) {
+    if (object instanceof Collection) { // 如果是集合，则添加到 collection 中
       ParamMap<Object> map = new ParamMap<>();
       map.put("collection", object);
       if (object instanceof List) {
@@ -189,7 +189,7 @@ public class ParamNameResolver {
       Optional.ofNullable(actualParamName).ifPresent(name -> map.put(name, object));
       return map;
     }
-    if (object != null && object.getClass().isArray()) {
+    if (object != null && object.getClass().isArray()) { // 如果是 Array ，则添加到 array 中
       ParamMap<Object> map = new ParamMap<>();
       map.put("array", object);
       Optional.ofNullable(actualParamName).ifPresent(name -> map.put(name, object));
