@@ -66,7 +66,7 @@ public class DefaultParameterHandler implements ParameterHandler {
   @Override
   public void setParameters(PreparedStatement ps) {
     ErrorContext.instance().activity("setting parameters").object(mappedStatement.getParameterMap().getId());
-    // 获取 ParameterMapping 数组
+    // 获取 ParameterMapping 数组（映射参数）
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     if (parameterMappings != null) {
       MetaObject metaObject = null;

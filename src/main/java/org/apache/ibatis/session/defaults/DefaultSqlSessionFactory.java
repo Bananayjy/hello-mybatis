@@ -101,11 +101,13 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
       // 获得 Environment 对象
       final Environment environment = configuration.getEnvironment();
       // 创建 Transaction 对象
+      // 如果environment中声明了先使用声明的TransactionFactory对象，否则使用ManagedTransactionFactory
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
-      // 创建 Executor 对象
+      // 创建 Executor 对象，即执行器对象，根据配置对象中的ExecutorType，默认为 configuration.getDefaultExecutorType() = SIMPLE
       final Executor executor = configuration.newExecutor(tx, execType);
-      // 创建 DefaultSqlSession 对象（需要 configuration、executor、autoCommit 三个参数）
+      // 创建 DefaultSqlSession 对象
+      // （需要 configuration、executor、autoCommit 三个参数，将他们维护在SqlSession对象的对应成员变量中）
       return createSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
       // 如果发生异常，则关闭 Transaction 对象

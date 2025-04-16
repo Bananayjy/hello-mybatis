@@ -22,8 +22,10 @@ import org.apache.ibatis.parsing.TokenHandler;
 import org.apache.ibatis.scripting.ScriptingException;
 import org.apache.ibatis.type.SimpleTypeRegistry;
 
-/** 实现 SqlNode 接口，文本的 SqlNode 实现类。相比 StaticTextSqlNode 的实现来说，TextSqlNode
- * 不确定是否为静态文本，所以提供 #isDynamic() 方法，进行判断是否为动态文本。
+/** 实现 SqlNode 接口，文本的 SqlNode 实现类。
+ * 相比 StaticTextSqlNode 的实现来说，TextSqlNode不确定是否为静态文本，所以提供 #isDynamic() 方法，进行判断是否为动态文本。
+ * 是 MyBatis 中用于处理 包含动态表达式（如 ${}）的文本 SQL 片段 的核心类，属于 SqlNode 接口的实现类之一。
+ * 它负责解析 SQL 文本中的 ${} 占位符，并在运行时直接替换为实际参数值（与 #{} 不同，${} 是直接拼接，而非预编译，#{}需要预编译占位符？）
  * @author Clinton Begin
  */
 public class TextSqlNode implements SqlNode {
@@ -41,7 +43,7 @@ public class TextSqlNode implements SqlNode {
     this.injectionFilter = injectionFilter;
   }
 
-  // 判断是否为动态文本
+  // 判断是否为动态文本（通过自定义的处理器DynamicCheckerTokenParser）
   public boolean isDynamic() {
     //  创建 DynamicCheckerTokenParser 对象
     DynamicCheckerTokenParser checker = new DynamicCheckerTokenParser();
@@ -53,6 +55,8 @@ public class TextSqlNode implements SqlNode {
     return checker.isDynamic();
   }
 
+  // 将动态文本中的${}替换为实际的值
+  // 注意：这里不会修改维护的text变量，会将动态文本解析后（即替换${}）的结果放到入参DynamicContext对象的sqlBuilder对象中
   @Override
   public boolean apply(DynamicContext context) {
     // 创建 BindingTokenParser 对象
@@ -102,6 +106,9 @@ public class TextSqlNode implements SqlNode {
     }
   }
 
+  // 动态检查器，用于判断是否为动态文本（即是否有${}）
+  // 重写TokenHandler的handleToken方法，对发现指定token，即${}，直接将 isDynamic 设置为true
+  // 通过isDynamic即可判断是否是动态文本（即是否包含${}）
   private static class DynamicCheckerTokenParser implements TokenHandler {
 
     // 是否为动态文本

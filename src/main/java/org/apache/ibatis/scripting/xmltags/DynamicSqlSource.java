@@ -22,6 +22,21 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * 动态的 SqlSource 实现类，实现 SqlSource 接口
+ * 含 ${}、OGNL 表达式 或 XML注解中的动态标签
+ *
+ * 关于OGNL表达式示例：
+ * <select id="findUser" resultType="User">
+ *     SELECT * FROM user
+ *     <where>
+ *         <if test="name != null and name != ''">
+ *             AND name = #{name}
+ *         </if>
+ *         <if test="age > 18">
+ *             AND age = #{age}
+ *         </if>
+ *     </where>
+ * </select>
+ *
  * @author Clinton Begin
  */
 public class DynamicSqlSource implements SqlSource {
@@ -40,17 +55,19 @@ public class DynamicSqlSource implements SqlSource {
   // 需要在每次执行 #getBoundSql(Object parameterObject) 方法，根据参数，生成对应的 SQL
   @Override
   public BoundSql getBoundSql(Object parameterObject) {
-    // 应用 rootSqlNode，即调用apply方法
+    // 应用 rootSqlNode，即调用apply方法，解析处理动态标签
     DynamicContext context = new DynamicContext(configuration, parameterObject);
     rootSqlNode.apply(context);
     // 创建 SqlSourceBuilder 对象
     SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
-    // 解析出 SqlSource 对象
-    Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+    // 解析出 SqlSource 对象（将#{} 替换成 ？）
+    // 此时 SqlSource为最终解析后的SQL，即StaticSqlSource
+    // 其中SQL中#{}中需要注入的参数都被封装到了parameterMappings中，并且#{}都被替换成了？封装到了SqlSource的sql对象中
+    Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass(); // 获取入参的类型
     SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
     // 获得 BoundSql 对象
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-    // 添加附加参数到 BoundSql 对象中
+    // 添加附加参数到 BoundSql 对象的additionalParameter变量中
     context.getBindings().forEach(boundSql::setAdditionalParameter);
     // 返回 BoundSql 对象
     return boundSql;

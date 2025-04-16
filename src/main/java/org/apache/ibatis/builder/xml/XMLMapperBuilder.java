@@ -504,7 +504,7 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   // 绑定Mapper
-  private void bindMapperForNamespace() {
+  private void  bindMapperForNamespace() {
     // 从MapperBuilderAssistant对象中获取当前命名空间
     String namespace = builderAssistant.getCurrentNamespace();
     if (namespace != null) {

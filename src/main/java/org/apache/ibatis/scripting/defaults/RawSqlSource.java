@@ -27,7 +27,7 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * 原始的 SqlSource 实现类，实现 SqlSource 接口
- * 适用于仅使用 #{} 表达式，或者不使用任何表达式的情况，所以它是静态的，仅需要在构造方法中，直接生成对应的 SQL
+ * 适用于仅使用 #{} 表达式，无动态标签，如 ${} 或 <if>，或者不使用任何表达式的情况，所以它是静态的，仅需要在构造方法中，直接生成对应的 SQL
  * Static SqlSource. It is faster than {@link DynamicSqlSource} because mappings are calculated during startup.
  *
  * @since 3.2.0

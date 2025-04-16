@@ -102,7 +102,16 @@ public class SimpleExecutor extends BaseExecutor {
     return Collections.emptyList();
   }
 
-  // 初始化 StatementHandler 对象
+  /**
+   * 初始化 StatementHandler 对象
+   * 1. 创建连接
+   * 2. 创建 JDBC 的 Statement 对象 或 PrepareStatement 对象
+   * 3. 通过 ParameterHandler 设置 SQL 上的参数
+   * @param handler
+   * @param statementLog
+   * @return
+   * @throws SQLException
+   */
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     // 通过父类的getConnection方法获得 Connection 对象

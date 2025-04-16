@@ -24,6 +24,7 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * 静态的 SqlSource 实现类，实现 SqlSource 接口
+ * 最终解析后的静态 SQL（已替换所有动态部分，直接可执行）
  * 注意：相对于 DynamicSqlSource 和 RawSqlSource 来说，StaticSqlSource.sql 属性，上面还是可能包括 ? 占位符
  * @author Clinton Begin
  */

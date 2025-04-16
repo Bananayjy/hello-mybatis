@@ -25,6 +25,13 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * 一次可执行的 SQL 封装
+ * 用于表示最终可执行的 SQL 语句及其参数映射信息，是 SqlSource 解析后的结果
+ * 包含了 JDBC 可直接执行的 SQL（已替换 #{} 为 ?）和参数绑定信息（ParameterMapping，即#{xxx}的xxx信息都会放在这里）
+ *
+ * 作用：
+ * 1.存储可执行的 SQL：将动态 SQL（如 <if>、${}、#{}）转换为静态 SQL（带 ? 占位符）。
+ * 2.维护参数映射：记录 #{} 中的参数名、类型、参数处理器（TypeHandler）
+ * 3.供 Executor 使用：最终由 JDBC PreparedStatement 执行
  * An actual SQL String got from an {@link SqlSource} after having processed any dynamic content. The SQL may have SQL
  * placeholders "?" and a list (ordered) of a parameter mappings with the additional information for each parameter (at
  * least the property name of the input object to read the value from).
@@ -40,9 +47,9 @@ public class BoundSql {
 
   // SQL 语句
   private final String sql;
-  //  ParameterMapping 数组
+  //  ParameterMapping 数组（参数绑定信息）
   private final List<ParameterMapping> parameterMappings;
-  // 参数对象
+  // 参数对象（传入的）
   private final Object parameterObject;
   // 附加的参数集合
   private final Map<String, Object> additionalParameters;

@@ -31,6 +31,7 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * 基于方法上的 @ProviderXXX 注解的 SqlSource 实现类，实现 SqlSource 接口
+ * 处理通过 @Provider 注解（如 @SelectProvider）提供的 SQL
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */

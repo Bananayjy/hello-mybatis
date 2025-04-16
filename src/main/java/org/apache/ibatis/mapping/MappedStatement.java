@@ -325,7 +325,7 @@ public final class MappedStatement {
   public BoundSql getBoundSql(Object parameterObject) {
     // 获得 BoundSql 对象
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-    //  忽略，因为 <parameterMap /> 已经废弃
+    // 如果映射参数parameterMappings为空，从parameterMap调用getParameterMappings获取
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     if (parameterMappings == null || parameterMappings.isEmpty()) {
       boundSql = new BoundSql(configuration, boundSql.getSql(), parameterMap.getParameterMappings(), parameterObject);

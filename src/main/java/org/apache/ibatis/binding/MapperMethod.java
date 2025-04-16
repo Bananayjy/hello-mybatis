@@ -97,7 +97,7 @@ public class MapperMethod {
         } else if (method.returnsCursor()) { // 执行查询，返回 Cursor
           result = executeForCursor(sqlSession, args);
         } else { // 执行查询，返回单个对象
-          // 转换参数
+          // 转换参数（入参映射关系）
           Object param = method.convertArgsToSqlCommandParam(args);
           // 查询单条
           result = sqlSession.selectOne(command.getName(), param);

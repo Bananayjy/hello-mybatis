@@ -100,7 +100,7 @@ public class CachingExecutor implements Executor {
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler)
       throws SQLException {
-    // 获得 BoundSql 对象
+    // 获得 BoundSql 对象（解析处理动态标签（这里包括${}的解析处理）、替换#{} -> ?, 生成映射参数，最终的sql相关信息封装成BoundSql对象）
     BoundSql boundSql = ms.getBoundSql(parameterObject);
     // 创建 CacheKey 对象
     CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
@@ -111,12 +111,12 @@ public class CachingExecutor implements Executor {
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler,
       CacheKey key, BoundSql boundSql) throws SQLException {
-    // 调用MappedStatement的getCache方法，获取Cache对象，即当前 MappedStatement 对象的二级缓存
+    // 调用MappedStatement的getCache方法，获取Cache对象，即当前 MappedStatement 对象的二级缓存处理实现类
     Cache cache = ms.getCache();
     if (cache != null) {  // 当前缓存不为null，则说明该 MappedStatement 对象，设置二级缓存
       // 如果需要清空缓存，则进行清空
       flushCacheIfRequired(ms);
-      // 当 MappedStatement#isUseCache() 方法，返回 true 时，才使用二级缓存。默认开启。
+      // 当 MappedStatement#isUseCache() 方法，返回 true 时，并且 resultHandler为null 才使用二级缓存。默认开启。
       // 通过 @Options(useCache = false) 或 <select useCache="false"> 方法，关闭
       if (ms.isUseCache() && resultHandler == null) {
         // 暂时忽略，存储过程相关

@@ -59,12 +59,12 @@ public class SqlSourceBuilder extends BaseBuilder {
     GenericTokenParser parser = new GenericTokenParser("#{", "}", handler);
     // 执行解析
     String sql;
-    if (configuration.isShrinkWhitespacesInSql()) {
+    if (configuration.isShrinkWhitespacesInSql()) { // 压缩 SQL 语句中的多余空白字符（如多余的空格、换行符等）
       sql = parser.parse(removeExtraWhitespaces(originalSql));
-    } else {
+    } else { // 不压缩 SQL 语句中的多余空白字符（如多余的空格、换行符等）
       sql = parser.parse(originalSql);
     }
-    // 创建 StaticSqlSource 对象
+    // 创建 StaticSqlSource 对象，即最终解析后的静态 SQL
     return new StaticSqlSource(configuration, sql, handler.getParameterMappings());
   }
 
@@ -108,7 +108,7 @@ public class SqlSourceBuilder extends BaseBuilder {
 
     @Override
     public String handleToken(String content) {
-      // 构建 ParameterMapping 对象，并添加到 parameterMappings 中
+      // 构建 ParameterMapping 对象，将#{xxx}中的xxx添加到 parameterMappings 中
       parameterMappings.add(buildParameterMapping(content));
       // 返回 ? 占位符
       return "?";
