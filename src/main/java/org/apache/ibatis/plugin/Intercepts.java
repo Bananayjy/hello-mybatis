@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 拦截器注解
  * The annotation that specify target methods to intercept.
  * <p>
  * <b>How to use:</b>
@@ -47,6 +48,7 @@ import java.lang.annotation.Target;
 public @interface Intercepts {
   /**
    * Returns method signatures to intercept.
+   * 拦截的方法签名的数组
    *
    * @return method signatures
    */

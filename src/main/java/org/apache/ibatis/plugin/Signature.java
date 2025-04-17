@@ -22,6 +22,7 @@ import java.lang.annotation.Target;
 
 /**
  * The annotation that indicate the method signature.
+ * 方法签名的注解。
  *
  * @see Intercepts
  *
@@ -33,6 +34,7 @@ import java.lang.annotation.Target;
 public @interface Signature {
   /**
    * Returns the java type.
+   * 返回的类
    *
    * @return the java type
    */
@@ -40,6 +42,7 @@ public @interface Signature {
 
   /**
    * Returns the method name.
+   * 方法名
    *
    * @return the method name
    */
@@ -47,6 +50,7 @@ public @interface Signature {
 
   /**
    * Returns java types for method argument.
+   * 参数类型
    *
    * @return java types for method argument
    */
