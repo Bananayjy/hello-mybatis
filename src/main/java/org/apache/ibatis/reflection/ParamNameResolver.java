@@ -64,6 +64,16 @@ public class ParamNameResolver {
   // 是否有@Param注解
   private boolean hasParamAnnotation;
 
+  /**
+   * 构造器功能：初始化hasParamAnnotation、useActualParamName、names成员变量
+   * 1.从当前Mapper接口对应的方法的@Param注解中获取参数名称
+   * 2.如果没有@Param注解，看是否开启了使用实际的参数名称，如果开启了，则根据方法参数的参数名中获取参数名称
+   * 3.如果没有开启使用实际的参数名称，使用 map 的顺序，作为编号
+   * 会将上面获取到的名称放入到map中，然后赋值给成员变量names对象进行存储
+   *
+   * @param config
+   * @param method
+   */
   public ParamNameResolver(Configuration config, Method method) {
     // 从配置文件中读取参数，是否使用实际的参数名称
     this.useActualParamName = config.isUseActualParamName();
