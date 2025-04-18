@@ -25,6 +25,7 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
+ * JdbcTransaction 工厂实现类(实现 TransactionFactory 接口)
  * Creates {@link JdbcTransaction} instances.
  *
  * @author Clinton Begin
@@ -35,6 +36,7 @@ public class JdbcTransactionFactory implements TransactionFactory {
 
   private boolean skipSetAutoCommitOnClose;
 
+  // 设置属性（这里只设置skipSetAutoCommitOnClose）
   @Override
   public void setProperties(Properties props) {
     if (props == null) {
@@ -48,11 +50,13 @@ public class JdbcTransactionFactory implements TransactionFactory {
 
   @Override
   public Transaction newTransaction(Connection conn) {
+    // 创建 JdbcTransaction 对象
     return new JdbcTransaction(conn);
   }
 
   @Override
   public Transaction newTransaction(DataSource ds, TransactionIsolationLevel level, boolean autoCommit) {
+    // 创建 JdbcTransaction 对象
     return new JdbcTransaction(ds, level, autoCommit, skipSetAutoCommitOnClose);
   }
 }
